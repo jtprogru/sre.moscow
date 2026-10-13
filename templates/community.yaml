@@ -1,0 +1,32 @@
+# Чат, канал, форум, подкаст, рассылка или митап-группа.
+# Скопируй файл в data/communities/<slug>.yaml, заполни и удали эти комментарии.
+# <slug> — латиница, цифры и дефисы: sre-chat.yaml, observability-weekly.yaml
+
+# Название так, как оно написано на самой площадке.
+title: Название чата или канала
+
+# Что это: chat, channel, forum, podcast, newsletter, meetup
+kind: chat
+
+# Где живёт: telegram, slack, discord, youtube, vk, matrix, email, web
+platform: telegram
+
+# Полный адрес. Для Telegram — публичная ссылка вида https://t.me/имя.
+url: https://t.me/example
+
+# Основной язык: ru или en
+lang: ru
+
+# О чём площадка и чем полезна, до 200 символов. Без рекламных слов.
+description: О чём здесь говорят и с каким вопросом сюда стоит прийти.
+
+# Темы — только id из data/topics.yaml, хотя бы одна.
+topics: [incidents, observability]
+
+# Состояние: active — живое, quiet — затихло, archived — закрыто, но архив полезен.
+status: active
+
+# added — сегодняшняя дата. verified — когда ссылку последний раз открывали
+# и сверяли; при добавлении совпадает с added.
+added: 2026-01-15
+verified: 2026-01-15
