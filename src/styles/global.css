@@ -1,0 +1,997 @@
+@import "./fonts.css";
+@import "./tokens.css";
+
+/* ─────────────────────── Основа ────────────────────────────────────────── */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: var(--gap-lg);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-base);
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  text-wrap: balance;
+}
+
+p, ul, ol { margin: 0; }
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition: color var(--transition);
+}
+
+a:hover { color: var(--accent-hover); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: var(--fs-code);
+  background: var(--code-inline-bg);
+  color: var(--code-fg);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+}
+
+pre {
+  margin: 0;
+  padding: var(--gap-md);
+  overflow-x: auto;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+}
+
+pre code { background: none; padding: 0; font-size: inherit; }
+
+[hidden] { display: none !important; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ─────────────────────── Каркас страницы ───────────────────────────────── */
+
+.container {
+  width: 100%;
+  max-width: calc(var(--container-width) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.site-header { border-bottom: 1px solid var(--border); }
+
+.site-header__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap-sm) var(--gap-lg);
+  padding-block: var(--gap-md);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.logo:hover { color: var(--fg); }
+.logo__mark { width: 1.75rem; height: 1.75rem; flex: none; }
+.logo__dot { color: var(--accent); }
+.logo__tld { color: var(--fg-muted); }
+
+/* Инструменты забирают всё, что осталось от логотипа и меню, и прижаты вправо:
+   строке поиска есть куда сжиматься, когда места мало. */
+.site-header__tools {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--gap-sm);
+  min-width: 0;
+}
+
+/* Три состояния шапки. До 768 px разделы и тема живут в меню, в шапке
+   логотип, строка поиска и кнопка меню. От 768 px разделы стоят второй
+   строкой, от 1024 px — в одной строке с логотипом. Вторая строка листается
+   вбок, если не помещается: страница при этом не скроллится по горизонтали. */
+.site-nav {
+  order: 3;
+  flex-basis: 100%;
+  display: flex;
+  gap: var(--gap-lg);
+  margin-inline: calc(-1 * var(--gutter));
+  padding-inline: var(--gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.site-nav a {
+  padding-block: var(--gap-sm);
+  color: var(--fg-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+}
+
+.site-nav a:hover { color: var(--fg); }
+.site-nav a[aria-current="page"] { color: var(--fg); border-bottom-color: var(--accent); }
+
+@media (min-width: 1024px) {
+  .site-nav { order: 0; flex: none; margin-inline: 0; padding-inline: 0; overflow: visible; }
+}
+
+.icon { flex: none; }
+
+.icon-button {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  background: none;
+  color: var(--fg-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.icon-button:hover { color: var(--fg); border-color: var(--border-strong); }
+
+/* В переключателе темы лежат три иконки, видна иконка текущего режима.
+   Без data-theme режим «как в системе». */
+.theme-toggle [data-theme-icon] { display: none; }
+
+:root:not([data-theme]) .theme-toggle [data-theme-icon="system"],
+:root[data-theme="light"] .theme-toggle [data-theme-icon="light"],
+:root[data-theme="dark"] .theme-toggle [data-theme-icon="dark"] { display: grid; }
+
+/* Строка поиска в шапке: выглядит полем, работает кнопкой. */
+.search-trigger {
+  display: inline-flex;
+  flex: 0 1 14rem;
+  align-items: center;
+  gap: var(--gap-sm);
+  min-width: 0;
+  height: 2.25rem;
+  padding-inline: 0.75rem var(--gap-sm);
+  background: var(--bg-elev);
+  color: var(--fg-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.search-trigger:hover { color: var(--fg); border-color: var(--accent); }
+.search-trigger__label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.search-trigger__kbd {
+  display: none;
+  padding-inline: 0.35rem;
+  background: var(--bg);
+  color: var(--fg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+/* Подсказка клавиши — только там, где есть клавиатура и место. */
+@media (hover: hover) and (min-width: 1024px) {
+  .search-trigger__kbd { display: inline-block; }
+}
+
+@media (pointer: coarse) {
+  .icon-button { width: var(--tap-min); height: var(--tap-min); }
+  .search-trigger { height: var(--tap-min); }
+}
+
+.menu-button { display: none; }
+
+@media (max-width: 767px) {
+  .site-nav, .site-header .theme-toggle { display: none; }
+  .menu-button { display: inline-grid; }
+}
+
+/* На самых узких экранах строке поиска в шапке тесно: она уходит в меню. */
+@media (max-width: 389px) {
+  .site-header .search-trigger { display: none; }
+}
+
+/* Вариант из нескольких: радиокнопка, которая выглядит кнопкой. Сам input
+   остаётся в документе и в порядке обхода, виден его сосед. */
+.choice { position: relative; cursor: pointer; }
+.choice input { position: absolute; opacity: 0; pointer-events: none; }
+
+.choice span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-sm);
+  min-height: var(--tap-min);
+  padding-inline: 0.75rem;
+  color: var(--fg-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+}
+
+.choice input:checked + span { background: var(--accent-soft); color: var(--fg); border-color: var(--accent); }
+.choice input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.choice--pill { flex: none; }
+.choice--pill span { min-height: 2rem; border-radius: var(--radius-pill); }
+
+@media (pointer: coarse) {
+  .choice--pill span { min-height: var(--tap-min); }
+}
+
+/* ─────────────────────── Меню на телефоне ──────────────────────────────── */
+
+.menu {
+  flex-direction: column;
+  gap: var(--gap-md);
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding:
+    calc(var(--gap-md) + env(safe-area-inset-top))
+    calc(var(--gutter) + env(safe-area-inset-right))
+    calc(var(--gap-lg) + env(safe-area-inset-bottom))
+    calc(var(--gutter) + env(safe-area-inset-left));
+  background: var(--bg);
+  color: var(--fg);
+  border: 0;
+  overflow-y: auto;
+}
+
+.menu[open] { display: flex; }
+
+.menu__head { display: flex; flex: none; align-items: center; justify-content: space-between; }
+
+/* В столбце базис строки поиска стал бы её высотой. */
+.menu .search-trigger { flex: none; }
+
+.menu__nav { display: grid; flex: none; }
+
+.menu__nav a {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+  min-height: 3.25rem;
+  padding-inline: var(--gap-sm);
+  color: var(--fg);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+}
+
+.menu__nav a[aria-current="page"] { background: var(--bg-elev); box-shadow: inset 3px 0 0 var(--accent); }
+.menu__nav .icon { color: var(--fg-muted); }
+
+/* Тема прижата к низу экрана: под большой палец. */
+.menu__theme {
+  display: grid;
+  flex: none;
+  gap: var(--gap-sm);
+  margin-block-start: auto;
+  padding-block-start: var(--gap-md);
+  border-top: 1px solid var(--border);
+}
+
+.menu__theme-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap-sm); }
+.menu__hint { color: var(--fg-muted); }
+
+main { flex: 1; padding-block: var(--gap-xl) var(--gap-2xl); }
+
+/* Подвал на --bg-elev, а не на --bg-sunken: ссылка акцентом на утопленном
+   фоне светлой темы даёт 4.22:1 и AA не проходит. */
+.site-footer {
+  background: var(--bg-elev);
+  border-top: 1px solid var(--border);
+  padding-block: var(--gap-lg);
+  color: var(--fg-muted);
+}
+
+.site-footer__row { display: grid; gap: var(--gap-lg); }
+
+@media (min-width: 768px) {
+  .site-footer__row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap-xl); }
+}
+
+.site-footer__group { display: grid; align-content: start; gap: var(--gap-sm); }
+.site-footer ul { display: grid; padding: 0; list-style: none; }
+.site-footer li a { display: inline-block; padding-block: var(--gap-xs); }
+
+/* ─────────────────────── Блоки страницы ────────────────────────────────── */
+
+.page-head { display: grid; gap: var(--gap-md); margin-block-end: var(--gap-xl); }
+
+/* Маскот красится цветом текста и токенами, отдельной палитры у него нет. */
+.mascot { display: block; width: 100%; height: auto; color: var(--fg); }
+
+/* Заголовок страницы с совой: на широком экране она стоит слева от текста. */
+.page-head__mascot { max-width: 9rem; }
+
+@media (min-width: 768px) {
+  .page-head--mascot { grid-template-columns: 13rem minmax(0, 1fr); align-items: center; column-gap: var(--gap-xl); }
+  .page-head--mascot > * { grid-column: 2; }
+  .page-head--mascot > .page-head__mascot { grid-column: 1; grid-row: 1 / span 4; max-width: none; }
+}
+.page-head__lead { max-width: var(--content-width); color: var(--fg-muted); }
+
+.section { margin-block-start: var(--gap-2xl); }
+
+.section__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--gap-sm) var(--gap-lg);
+  margin-block-end: var(--gap-lg);
+}
+
+.prose { max-width: var(--content-width); display: grid; gap: var(--gap-md); }
+.prose h2 { margin-block-start: var(--gap-lg); }
+.prose ul, .prose ol { padding-inline-start: 1.25rem; display: grid; gap: var(--gap-sm); }
+
+.eyebrow { color: var(--fg-subtle); }
+
+.empty { color: var(--fg-muted); }
+
+/* Полоса на ширину сетки: короткий текст слева, действие справа. На телефоне
+   действие уходит под текст. */
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-md) var(--gap-lg);
+  padding: var(--gap-md);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.strip__body { display: grid; gap: var(--gap-xs); min-width: 0; max-width: var(--content-width); }
+.strip__text { color: var(--fg-muted); }
+.strip__actions { display: flex; flex-wrap: wrap; gap: var(--gap-sm); }
+
+@media (max-width: 599px) {
+  .strip__actions { flex-basis: 100%; }
+  .strip__actions .button { flex: 1 1 auto; }
+}
+.strip__list { display: grid; gap: var(--gap-xs); padding: 0; list-style: none; }
+
+/* В полосе про ближайшее событие лежит несколько событий, видно первое:
+   когда скрипт уберёт прошедшее, его место займёт следующее. */
+.strip__list li:not(:first-child) { display: none; }
+.strip__list li { display: grid; gap: var(--gap-xs); }
+.strip__title { color: var(--fg); text-decoration: none; }
+a.strip__title:hover { color: var(--accent); text-decoration: underline; }
+
+/* ─────────────────────── Кнопки и метки ────────────────────────────────── */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-sm);
+  min-height: 2.75rem;
+  padding: 0.5rem 1.1rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.button:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: var(--on-accent); }
+
+.button--ghost { background: none; color: var(--fg); border-color: var(--border-strong); }
+.button--ghost:hover { background: var(--bg-elev); color: var(--fg); border-color: var(--border-strong); }
+
+.button--small { min-height: 2.25rem; padding: 0.3rem 0.8rem; }
+
+.actions { display: flex; flex-wrap: wrap; gap: var(--gap-sm); }
+
+.tags { display: flex; flex-wrap: wrap; gap: var(--gap-xs) var(--gap-sm); padding: 0; list-style: none; }
+
+.tag {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  background: var(--bg-sunken);
+  color: var(--fg-muted);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+a.tag:hover { color: var(--fg); }
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+
+.badge--tip    { border-color: var(--c-tip);    color: var(--c-tip-text); }
+.badge--warn   { border-color: var(--c-warn);   color: var(--c-warn-text); }
+.badge--danger { border-color: var(--c-danger); color: var(--c-danger-text); }
+
+/* Строка мелких фактов через точку. Точка стоит слева от элемента, вне его
+   бокса, а контейнер обрезан по своему левому краю: у первого элемента в
+   каждой строке точка попадает под обрез. Так перенос не начинает строку
+   с разделителя, сколько бы строк ни получилось. */
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap-xs) 1.1em;
+  clip-path: inset(-0.25rem -0.25rem -0.25rem -0.2rem);
+  color: var(--fg-muted);
+}
+
+.meta > * { position: relative; }
+
+.meta > *::before {
+  content: "·";
+  position: absolute;
+  inset-inline-start: -0.7em;
+  color: var(--fg-subtle);
+}
+
+.meta > .badge::before, .meta > .badge + *::before { content: none; }
+
+/* ─────────────────────── Карточки ──────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: var(--gap-md);
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  height: 100%;
+  padding: var(--gap-card);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.card:target { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+
+/* Шапка карточки человека: лицо слева, имя справа. */
+.card__head { display: flex; align-items: center; gap: var(--gap-md); }
+
+.card__title a { color: var(--fg); text-decoration: none; }
+.card__title a:hover { color: var(--accent); text-decoration: underline; }
+.card__text { color: var(--fg-muted); }
+.card__foot { margin-block-start: auto; padding-block-start: var(--gap-sm); display: grid; gap: var(--gap-sm); }
+
+.links { display: flex; flex-wrap: wrap; gap: var(--gap-xs) var(--gap-md); padding: 0; list-style: none; }
+
+/* Каталог списком: запись становится строкой с названием и фактами. Описания
+   и меток тем в строке нет: текст, у которого нет своей страницы, не
+   обрезается, он либо показан целиком в карточке, либо не показан. Вид ставит
+   на <html> скрипт из Base.astro, разметка у записи одна. */
+:root[data-view="list"] .catalog { grid-template-columns: minmax(0, 1fr); gap: 0; border-block-start: 1px solid var(--border); }
+
+:root[data-view="list"] .catalog .card {
+  height: auto;
+  gap: var(--gap-xs);
+  padding: var(--gap-card) 0;
+  background: none;
+  border: 0;
+  border-block-end: 1px solid var(--border);
+  border-radius: 0;
+}
+
+:root[data-view="list"] .catalog .card:target { padding-inline-start: var(--gap-card); box-shadow: inset 3px 0 0 var(--accent); }
+:root[data-view="list"] .catalog :is(.card__text, .tags, .links) { display: none; }
+:root[data-view="list"] .catalog .card__foot { margin: 0; padding: 0; }
+:root[data-view="list"] .catalog .card__foot:not(:has(.meta)) { display: none; }
+:root[data-view="list"] .catalog .avatar { width: 2.5rem; }
+
+/* Два числа на главной: сколько в каталоге докладов и сколько сообществ.
+   Плитки делят ширину пополам на любом экране. */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap-sm);
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 600px) {
+  .tiles { gap: var(--gap-md); }
+  .tile { gap: var(--gap-sm); padding: var(--gap-lg); }
+}
+
+.tile {
+  display: grid;
+  align-content: start;
+  gap: var(--gap-xs);
+  height: 100%;
+  padding: var(--gap-md);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--fg);
+  text-decoration: none;
+  transition: border-color var(--transition);
+}
+
+.tile:hover { border-color: var(--accent); color: var(--fg); }
+.tile__count { color: var(--accent); }
+.tile__text { color: var(--fg-muted); }
+
+/* ─────────────────────── События ───────────────────────────────────────── */
+
+.events { display: grid; gap: var(--gap-md); padding: 0; list-style: none; }
+
+.event {
+  display: grid;
+  grid-template-columns: 4.25rem minmax(0, 1fr);
+  gap: var(--gap-md);
+  padding: var(--gap-md);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.event:target { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+
+.event__date {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 0.1rem;
+  padding-block: var(--gap-xs);
+  border-inline-end: 1px solid var(--border);
+  padding-inline-end: var(--gap-md);
+  text-align: center;
+}
+
+.event__day { color: var(--fg); }
+.event__month, .event__weekday { color: var(--fg-muted); }
+
+.event__body { display: grid; gap: var(--gap-sm); min-width: 0; }
+.event__title a { color: var(--fg); text-decoration: none; }
+.event__title a:hover { color: var(--accent); text-decoration: underline; }
+
+.month { margin-block-start: var(--gap-xl); }
+.month:first-of-type { margin-block-start: 0; }
+.month__title { margin-block-end: var(--gap-md); color: var(--fg-muted); }
+
+/* ─────────────────────── Фильтры ───────────────────────────────────────── */
+
+.toolbar { display: grid; gap: var(--gap-sm); margin-block-end: var(--gap-lg); }
+
+.toolbar__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-sm) var(--gap-md);
+}
+
+/* На телефоне от фильтров видна кнопка, поля раскрываются под ней. */
+.filters { display: grid; gap: var(--gap-sm); }
+.filters__toggle { justify-self: start; }
+
+.filters__active {
+  min-width: 1.5rem;
+  padding-inline: var(--gap-xs);
+  background: var(--accent-soft);
+  color: var(--fg);
+  border-radius: var(--radius-pill);
+  text-align: center;
+}
+
+.filters__fields {
+  display: none;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--gap-sm) var(--gap-md);
+  padding: var(--gap-md);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.filters[data-open] .filters__fields { display: flex; }
+
+@media (min-width: 600px) {
+  .filters__toggle { display: none; }
+  .filters__fields { display: flex; }
+}
+
+.filters__field { display: grid; gap: var(--gap-xs); flex: 1 1 9rem; min-width: 0; }
+.filters__field label { color: var(--fg-muted); }
+
+.filters select {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.3rem 0.6rem;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  font: inherit;
+}
+
+.filters__status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-sm) var(--gap-md); color: var(--fg-muted); }
+
+.filters__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--accent);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+/* Вид каталога: две иконки справа от счётчика. */
+.view-switch { display: flex; gap: var(--gap-xs); min-width: 0; margin: 0 0 0 auto; padding: 0; border: 0; }
+.choice--icon span { width: var(--tap-min); padding-inline: 0; }
+
+/* Под палец: малые кнопки, поля и метки-ссылки вырастают до 44 px. У метки
+   растёт только область нажатия, сама плашка остаётся прежней высоты. */
+@media (pointer: coarse) {
+  .button--small, .filters select, .filters__reset { min-height: var(--tap-min); }
+
+  a.tag {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--tap-min);
+    min-height: var(--tap-min);
+    background: none;
+    isolation: isolate;
+  }
+
+  a.tag::before {
+    content: "";
+    position: absolute;
+    inset: 50% 0 auto;
+    z-index: -1;
+    height: 1.5rem;
+    background: var(--bg-sunken);
+    border-radius: var(--radius-pill);
+    translate: 0 -50%;
+  }
+
+  .tags:has(a.tag) { row-gap: 0; }
+}
+
+/* ─────────────────────── Главная ───────────────────────────────────────── */
+
+/* Первый экран: картинка, рядом заголовок с текстом и кнопками, под ними два
+   числа на всю ширину. До 1024 px всё стоит в столбик и картинка небольшая. */
+.hero { display: grid; gap: var(--gap-lg); padding-block: var(--gap-lg) var(--gap-md); }
+.hero__text { display: grid; gap: var(--gap-lg); min-width: 0; }
+.hero__visual { max-width: 11rem; }
+.hero__scene--wide { display: none; }
+
+@media (min-width: 1024px) {
+  .hero { grid-template-columns: 22rem minmax(0, 1fr); align-items: center; gap: var(--gap-xl) var(--gap-2xl); }
+  .hero__visual { max-width: none; }
+  .hero__scene--wide { display: block; }
+  .hero__scene--narrow { display: none; }
+  .hero > .tiles { grid-column: 1 / -1; }
+}
+.hero__lead { max-width: 42rem; color: var(--fg-muted); }
+
+/* На телефоне две кнопки делят строку пополам. */
+@media (max-width: 599px) {
+  .hero__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero__actions .button { padding-inline: var(--gap-sm); }
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: var(--gap-md); padding: 0; list-style: none; counter-reset: step; }
+
+.step {
+  display: grid;
+  align-content: start;
+  gap: var(--gap-sm);
+  padding: var(--gap-md);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  counter-increment: step;
+}
+
+.step::before { content: counter(step, decimal-leading-zero); color: var(--accent); }
+.step p { color: var(--fg-muted); }
+
+/* ─────────────────────── Профиль и карточка организатора ───────────────── */
+
+.profile { display: grid; gap: var(--gap-lg); }
+.profile__body { display: grid; gap: var(--gap-md); min-width: 0; }
+.profile__bio { max-width: var(--content-width); }
+
+/* Лицо профиля: фото или инициалы в круге. Размер задан здесь, атрибуты
+   width и height у картинки только держат место до загрузки. */
+.avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: var(--accent-soft);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  color: var(--fg);
+  user-select: none;
+}
+
+.avatar--profile { width: 6rem; }
+
+/* На широком экране лицо стоит слева от имени и текста. */
+@media (min-width: 600px) {
+  .profile__head { grid-template-columns: auto minmax(0, 1fr); align-items: start; column-gap: var(--gap-lg); }
+  .avatar--profile { width: 8rem; }
+}
+
+/* Ссылка назад, в каталог: стрелка иконкой и подпись. */
+.back { display: inline-flex; align-items: center; gap: var(--gap-xs); margin-block-end: var(--gap-md); }
+
+/* ─────────────────────── Поиск ─────────────────────────────────────────── */
+
+/* Окно прижато к верху, а не стоит по центру: результаты меняют его высоту,
+   и поле ввода при этом не должно прыгать. */
+.search {
+  flex-direction: column;
+  width: min(100% - 2 * var(--gutter), 40rem);
+  max-width: none;
+  max-height: min(100dvh - 2 * var(--gap-xl), 44rem);
+  margin: var(--gap-xl) auto auto;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.search[open] { display: flex; }
+.search::backdrop { background: var(--scrim); }
+
+/* На телефоне окно занимает весь экран. */
+@media (max-width: 599px) {
+  .search {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    border: 0;
+    border-radius: 0;
+  }
+}
+
+.search__head {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: var(--gap-md) var(--gap-md) var(--gap-sm);
+}
+
+.search__field {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--gap-sm);
+  min-width: 0;
+  padding-inline: 0.75rem;
+  background: var(--bg-elev);
+  color: var(--fg-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+/* Обводку фокуса несёт всё поле вместе с иконкой, а не один input внутри. */
+.search__field:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.search__field input {
+  flex: 1;
+  min-width: 0;
+  height: var(--tap-min);
+  padding: 0;
+  background: none;
+  color: var(--fg);
+  border: 0;
+  font: inherit;
+}
+
+.search__field input:focus-visible { outline: none; }
+
+/* Свой крестик у поля type="search" убран: рядом стоит кнопка, которая
+   закрывает окно, и два крестика подряд читаются как одно и то же. */
+.search__field input::-webkit-search-cancel-button { display: none; }
+.search__field input::placeholder { color: var(--fg-subtle); opacity: 1; }
+
+.search__scopes {
+  display: flex;
+  flex: none;
+  gap: var(--gap-sm);
+  min-width: 0;
+  margin: 0;
+  padding: var(--gap-xs) var(--gap-md) var(--gap-sm);
+  border: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.search__status { flex: none; padding: 0 var(--gap-md) var(--gap-md); color: var(--fg-muted); }
+
+.search__results {
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--gap-sm) var(--gap-sm);
+  border-top: 1px solid var(--border);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.search__results:empty { display: none; }
+
+.search__group-title { display: flex; align-items: center; gap: var(--gap-sm); padding: var(--gap-md) var(--gap-sm) var(--gap-xs); }
+
+.search__option {
+  display: grid;
+  gap: var(--gap-xs);
+  padding: var(--gap-sm);
+  color: var(--fg);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+}
+
+.search__option:hover { color: var(--fg); }
+.search__option[aria-selected="true"] { background: var(--bg-elev); box-shadow: inset 3px 0 0 var(--accent); }
+.search__option-sub { color: var(--fg-muted); }
+
+/* ─────────────────────── Роли текста ───────────────────────────────────── */
+
+/* Кегль, начертание, интерлиньяж и трекинг назначаются только здесь, по ролям
+   из BRAND.md, и только токенами. Правила блоков выше отвечают за раскладку
+   и цвет. Секция стоит после них, чтобы роль побеждала `font: inherit`
+   у кнопок и полей. Новый блок получает роль, а не свой размер. */
+
+/* Заголовок главной */
+.hero h1 { font-size: var(--fs-hero); }
+
+/* Заголовок страницы */
+h1 { font-size: var(--fs-page); }
+
+/* Заголовок блока */
+h2 { font-size: var(--fs-block); }
+
+/* Заголовок записи: карточка, событие, шаг, результат поиска, полоса, плитка */
+h3, .card__title, .event__title, .search__option-title, .strip__title, .tile__title {
+  font-size: var(--fs-base);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+}
+
+/* Вводный абзац и строка раздела в меню */
+.page-head__lead, .hero__lead, .profile__bio, .menu__nav a { font-size: var(--fs-md); line-height: var(--lh-snug); }
+
+/* Вторичный текст */
+.meta, .links, .back, .card__text, .strip__text, .filters__active, .site-nav a, .site-footer, .step p, .filters__field label, .filters__status,
+.search-trigger, .search__status, .search__option-sub, .choice, .menu__hint, .tile__text {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+}
+
+/* Метка темы */
+.tag { font-size: var(--fs-xs); line-height: var(--lh-snug); }
+
+/* Дата, надзаголовок, бейдж, номер шага, подсказка клавиши */
+.eyebrow, .badge, .event__month, .event__weekday, .step::before, .search-trigger__kbd {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-snug);
+}
+
+/* Капсы — только с разрядкой */
+.eyebrow, .event__month, .event__weekday { text-transform: uppercase; letter-spacing: var(--ls-caps); }
+
+/* Крупная цифра: число дня, число на главной */
+.event__day, .tile__count { font-size: var(--fs-2xl); font-weight: var(--fw-bold); line-height: var(--lh-none); }
+
+/* На широком экране плитки с числами крупные */
+@media (min-width: 600px) {
+  .tile__count { font-size: var(--fs-4xl); }
+  .tile__title { font-size: var(--fs-lg); }
+  .tile__text { font-size: var(--fs-base); }
+}
+
+/* Инициалы в круге вместо фото */
+.avatar { font-size: var(--fs-lg); font-weight: var(--fw-bold); line-height: var(--lh-none); }
+.avatar--profile { font-size: var(--fs-3xl); }
+
+/* Цифры в датах и счётчиках держат ширину */
+time, .event__date, .tile__count, [data-filters-count] { font-variant-numeric: tabular-nums; }
+
+/* Словесный знак */
+.logo { font-size: var(--fs-lg); font-weight: var(--fw-bold); letter-spacing: var(--ls-tight); }
+.logo__tld { font-weight: var(--fw-regular); }
+
+/* Кнопка */
+.button { font-weight: var(--fw-bold); line-height: var(--lh-tight); }
+.button--small { font-size: var(--fs-sm); }
+
+/* Поля форм: не мельче 16 px, иначе iOS Safari приближает страницу при фокусе */
+.filters select, .search__field input { font-size: var(--fs-base); line-height: var(--lh-snug); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .site-header__tools, .filters, .site-nav { display: none; }
+}
