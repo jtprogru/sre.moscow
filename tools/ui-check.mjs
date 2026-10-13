@@ -13,9 +13,10 @@
  *   — каталог переключается между списком и карточками и помнит выбор,
  *     фильтры на телефоне раскрываются кнопкой.
  *
- * Ходит по всем страницам dist/ в обеих темах по матрице профилей. Скриншоты
- * складывает в ui-check/, чтобы посмотреть глазами: с эталоном они не
- * сравниваются, сглаживание шрифтов на разных системах разное.
+ * Ходит по всем страницам dist/ в обеих темах по матрице профилей, движки
+ * работают параллельно. Скриншоты складывает в ui-check/, чтобы посмотреть
+ * глазами: с эталоном они не сравниваются, сглаживание шрифтов на разных
+ * системах разное.
  *
  *   node tools/ui-check.mjs [--engine chromium] [--profile laptop] [--page /people/] [--no-shots] [--strict]
  *
@@ -23,7 +24,8 @@
  * --strict и в CI это ошибка. Поставить движки: bunx playwright install.
  *
  * Проверка идёт минуты, поэтому не молчит: сначала план, потом строка на
- * каждый прогон «движок-экран-тема» с его временем и числом нарушений. В
+ * каждый прогон с его временем и числом нарушений. Прогон — «движок-экран-тема»
+ * по всем страницам либо «движок-экран-controls»: поиск, меню и каталог. В
  * GitHub Actions итог виден и без лога: нарушения уходят аннотациями, отчёт
  * с таблицей прогонов — на страницу запуска.
  *
@@ -306,6 +308,9 @@ async function catalogControls(page, width) {
 /** Страница, на которой проверяются переключатель вида и фильтры. */
 const CATALOG = '/talks/';
 
+/** Имя прогона с управлением: стоит там же, где у остальных тема. */
+const CONTROLS = 'controls';
+
 const slug = (path) => path.replace(/^\/|\/$/g, '').replace(/\.html$/, '').replaceAll('/', '_') || 'index';
 
 async function main() {
@@ -332,98 +337,108 @@ async function main() {
 
   if (shots) rmSync(out, { recursive: true, force: true });
 
-  // Прогон — один движок на одном экране в одной теме: все страницы подряд.
+  // Прогон — один движок на одном экране: все страницы в одной теме либо
+  // управление — поиск, меню и каталог, которые от темы не зависят и потому
+  // идут отдельно, раз на экран. Движки работают параллельно, прогоны внутри
+  // движка — по очереди: так строки одного браузера не перемешаны между собой.
+  const stages = pages.includes('/') || pages.includes(CATALOG) ? [...THEMES, CONTROLS] : THEMES;
   const plan = engines.map((engine) => ({ engine, screens: profiles.filter((item) => item.engines.includes(engine)) }));
-  const names = plan.flatMap(({ engine, screens }) => screens.flatMap((profile) => THEMES.map((theme) => `${engine}-${profile.name}-${theme}`)));
-  const total = names.length;
+  const names = plan.flatMap(({ engine, screens }) => screens.flatMap((profile) => stages.map((stage) => `${engine}-${profile.name}-${stage}`)));
   const pad = Math.max(0, ...names.map((name) => name.length));
   const started = Date.now();
 
   /** нарушение → где встретилось: [{ path, run }] */
   const violations = new Map();
-  /** нарушения текущего прогона */
-  let hits = new Set();
-  const note = (rule, detail, path, run) => {
-    const key = `${rule}: ${detail}`;
-    violations.set(key, [...(violations.get(key) ?? []), { path, run }]);
-    hits.add(key);
-  };
+  /** прогон → { name, ms, violations } */
+  const results = new Map();
   const skipped = [];
-  const runs = [];
+  let total = names.length;
   let loads = 0;
   let done = 0;
 
-  console.log(`Вёрстка: страниц ${pages.length}, прогонов ${total} — ${plan.map(({ engine, screens }) => `${engine}: ${screens.length * THEMES.length}`).join(', ')}. Ниже строка на прогон: движок, экран, тема.`);
+  console.log(`Вёрстка: страниц ${pages.length}, прогонов ${total}, движки параллельно — ${plan.map(({ engine, screens }) => `${engine}: ${screens.length * stages.length}`).join(', ')}.`);
+  console.log(`Прогон — движок, экран и тема${stages.includes(CONTROLS) ? `; ${CONTROLS} — поиск, меню и каталог: раз на экран, от темы не зависят` : ''}.`);
 
-  for (const { engine, screens } of plan) {
+  const check = async ({ engine, screens }) => {
     let browser;
     try {
       browser = await playwright[engine].launch();
     } catch (error) {
       skipped.push(engine);
-      done += screens.length * THEMES.length;
+      total -= screens.length * stages.length;
       console.warn(`! ${engine} не запустился и пропущен: ${String(error.message).split('\n')[0]}`);
-      continue;
+      return;
     }
     console.log(`${engine} ${browser.version()}`);
 
     for (const profile of screens) {
-      for (const theme of THEMES) {
-        const run = `${engine}-${profile.name}-${theme}`;
+      for (const stage of stages) {
+        const run = `${engine}-${profile.name}-${stage}`;
         const began = Date.now();
-        hits = new Set();
+        const hits = new Set();
+        const note = (rule, detail, path) => {
+          const key = `${rule}: ${detail}`;
+          violations.set(key, [...(violations.get(key) ?? []), { path, run }]);
+          hits.add(key);
+        };
+
         const context = await browser.newContext({
           viewport: { width: profile.width, height: profile.height },
-          colorScheme: theme,
+          colorScheme: stage === CONTROLS ? 'light' : stage,
           hasTouch: profile.touch,
           // Firefox не знает isMobile, а без него Chromium не включает pointer: coarse.
           ...(profile.touch && engine !== 'firefox' ? { isMobile: true } : {}),
         });
         const page = await context.newPage();
         let current = '';
-        page.on('pageerror', (error) => note('ошибка в скрипте', error.message, current, run));
+        page.on('pageerror', (error) => note('ошибка в скрипте', error.message, current));
         page.on('console', (message) => {
           // 404-я страница законно получает 404 на свой адрес.
-          if (message.type() === 'error' && !/404/.test(message.text())) note('ошибка в консоли', message.text(), current, run);
+          if (message.type() === 'error' && !/404/.test(message.text())) note('ошибка в консоли', message.text(), current);
         });
 
-        if (shots) mkdirSync(join(out, run), { recursive: true });
-
-        for (const path of pages) {
-          current = path;
-          await page.goto(base + path, { waitUntil: 'networkidle' });
-          await page.evaluate(() => document.fonts.ready);
-          loads += 1;
-          for (const { rule, detail } of await page.evaluate(audit, { touch: profile.touch, width: profile.width })) note(rule, detail, path, run);
-          if (shots) await page.screenshot({ path: join(out, run, `${slug(path)}.jpg`), type: 'jpeg', quality: 80, fullPage: true });
-        }
-
-        // Клавиатуру проверяем один раз на прогон, на главной и в светлой теме.
-        if (theme === 'light' && pages.includes('/')) {
-          current = '/';
-          await page.goto(`${base}/`, { waitUntil: 'networkidle' });
-          for (const problem of await searchByKeyboard(page)) note('поиск с клавиатуры', problem, '/', run);
-          if (profile.width < 768) {
+        if (stage === CONTROLS) {
+          if (pages.includes('/')) {
+            current = '/';
             await page.goto(`${base}/`, { waitUntil: 'networkidle' });
-            for (const problem of await menuByKeyboard(page)) note('меню с клавиатуры', problem, '/', run);
+            for (const problem of await searchByKeyboard(page)) note('поиск с клавиатуры', problem, '/');
+            if (profile.width < 768) {
+              await page.goto(`${base}/`, { waitUntil: 'networkidle' });
+              for (const problem of await menuByKeyboard(page)) note('меню с клавиатуры', problem, '/');
+            }
           }
-        }
-        if (theme === 'light' && pages.includes(CATALOG)) {
-          current = CATALOG;
-          await page.goto(base + CATALOG, { waitUntil: 'networkidle' });
-          for (const problem of await catalogControls(page, profile.width)) note('каталог', problem, CATALOG, run);
+          if (pages.includes(CATALOG)) {
+            current = CATALOG;
+            await page.goto(base + CATALOG, { waitUntil: 'networkidle' });
+            for (const problem of await catalogControls(page, profile.width)) note('каталог', problem, CATALOG);
+          }
+        } else {
+          if (shots) mkdirSync(join(out, run), { recursive: true });
+          for (const path of pages) {
+            current = path;
+            await page.goto(base + path, { waitUntil: 'networkidle' });
+            await page.evaluate(() => document.fonts.ready);
+            loads += 1;
+            for (const { rule, detail } of await page.evaluate(audit, { touch: profile.touch, width: profile.width })) note(rule, detail, path);
+            if (shots) await page.screenshot({ path: join(out, run, `${slug(path)}.jpg`), type: 'jpeg', quality: 80, fullPage: true });
+          }
         }
         await context.close();
 
         done += 1;
         const ms = Date.now() - began;
-        runs.push({ name: run, ms, violations: hits.size });
+        results.set(run, { name: run, ms, violations: hits.size });
         console.log(`  [${String(done).padStart(String(total).length)}/${total}] ${run.padEnd(pad)} ${duration(ms).padStart(7)}  ${hits.size ? `✗ нарушений: ${hits.size}` : '✓'}`);
       }
     }
     await browser.close();
-  }
+  };
+
+  await Promise.all(plan.map(check));
   server.close();
+
+  // В отчёте прогоны стоят по плану, а не в том порядке, в каком закончились.
+  const runs = names.flatMap((name) => results.get(name) ?? []);
 
   const elapsed = Date.now() - started;
   const ran = engines.filter((engine) => !skipped.includes(engine));
