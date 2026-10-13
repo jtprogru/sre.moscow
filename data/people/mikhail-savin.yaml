@@ -1,0 +1,12 @@
+name: Михаил Савин
+photo: https://github.com/jtprogru.png
+bio: "Руковожу отделом SRE в публичном облаке H3LLO CLOUD, в эксплуатации с 2014 года. Состою в программном комитете DevOpsConf, веду открытую карту компетенций The Way of SRE и блог jtprog.ru. Пишу про SLO, error budget и устойчивость систем."
+topics: [slo, resilience, culture, career]
+links:
+  telegram: https://t.me/jtprogru_channel
+  github: https://github.com/jtprogru
+  site: https://jtprog.ru
+open_to: [questions, mentoring, speaking]
+consent:
+  by: self
+  date: 2026-10-09
