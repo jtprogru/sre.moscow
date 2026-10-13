@@ -1,0 +1,20 @@
+name: АОТ
+kind: community
+links:
+  - kind: events
+    url: https://aot-kuberconf.ru/
+    label: Kuber Conf от АОТ
+  - kind: cfp
+    url: https://aot-kuberconf.ru/cfp
+    label: Докладчикам
+series:
+  - name: Kuber Conf от АОТ
+    cadence: раз в год
+formats: [offline]
+cities: [Москва]
+lang: ru
+topics: [kubernetes, platform, observability, networking]
+why: "Ассоциация VK Cloud, Yandex Cloud и «Фланта» проводит Kuber Conf — некоммерческую конференцию по Kubernetes, независимую от вендоров: эксплуатация кластеров, сети, observability."
+status: active
+added: 2026-10-09
+verified: 2026-10-09

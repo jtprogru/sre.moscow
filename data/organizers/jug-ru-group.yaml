@@ -1,0 +1,24 @@
+name: JUG Ru Group
+kind: conference-organizer
+links:
+  - kind: events
+    url: https://devoops.ru/
+    label: DevOops
+  - kind: recordings
+    url: https://www.youtube.com/@DevOops_conf
+    label: YouTube
+  - kind: announcements
+    url: https://t.me/devoops_channel
+    label: Telegram
+series:
+  - name: DevOops
+    url: https://devoops.ru/
+    cadence: раз в год
+formats: [hybrid]
+cities: [Санкт-Петербург]
+lang: ru
+topics: [observability, monitoring, kubernetes, platform, culture]
+why: "DevOops — ежегодная конференция по инженерным решениям и DevOps-культуре с докладами про SRE и observability. Записи прошлых лет открыты на YouTube."
+status: active
+added: 2026-10-09
+verified: 2026-10-09

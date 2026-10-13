@@ -1,0 +1,17 @@
+name: AvitoTech
+kind: company
+links:
+  - kind: events
+    url: https://avito.tech/events
+    label: Мероприятия
+  - kind: events
+    url: https://avitotech.timepad.ru/events/
+    label: Регистрация на TimePad
+formats: [offline, online]
+cities: [Москва]
+lang: ru
+topics: [platform, databases, automation]
+why: "Митапы инженеров Авито в московском офисе и онлайн: бэкенд, DBA, DevOps и платформа среди прочих тем. Анонсы на сайте, регистрация через TimePad."
+status: active
+added: 2026-10-09
+verified: 2026-10-09

@@ -1,0 +1,14 @@
+name: Яндекс
+kind: company
+links:
+  - kind: events
+    url: https://events.yandex.ru/
+    label: События Яндекса
+formats: [hybrid]
+cities: [Москва]
+lang: ru
+topics: [resilience, incidents, platform, networking]
+why: "Общий календарь событий Яндекса. Среди ML и продуктовых конференций там же выходят инженерные: nexthop, «я про бэкенд», митапы Яндекс Go про отказоустойчивость."
+status: active
+added: 2026-10-09
+verified: 2026-10-09

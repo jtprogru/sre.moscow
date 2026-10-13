@@ -1,0 +1,20 @@
+name: SREday
+kind: conference-organizer
+links:
+  - kind: events
+    url: https://sreday.com/
+  - kind: recordings
+    url: https://www.youtube.com/@sreday
+    label: YouTube
+series:
+  - name: SREday
+    url: https://sreday.com/
+    cadence: несколько городов каждый квартал
+formats: [offline]
+cities: [Амстердам, Варшава, Лондон, Нью-Йорк, Сан-Франциско]
+lang: en
+topics: [resilience, observability, incidents, platform]
+why: "Серия однодневных очных конференций по SRE в городах Европы, Америки и Азии. Записи докладов выкладывают на YouTube."
+status: active
+added: 2026-10-09
+verified: 2026-10-09

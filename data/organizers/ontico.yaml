@@ -1,0 +1,27 @@
+name: Онтико
+kind: conference-organizer
+links:
+  - kind: events
+    url: https://ontico.ru/calendar.html
+    label: Календарь конференций
+  - kind: recordings
+    url: https://www.youtube.com/@HighLoadChannel
+    label: YouTube
+  - kind: announcements
+    url: https://t.me/HighLoadChannel
+    label: Telegram
+series:
+  - name: HighLoad++
+    url: https://highload.ru/
+    cadence: раз в год, Москва
+  - name: Saint HighLoad++
+    cadence: раз в год, июнь, Санкт-Петербург
+  - name: DevOpsConf
+formats: [hybrid]
+cities: [Москва, Санкт-Петербург]
+lang: ru
+topics: [resilience, performance, databases, platform]
+why: "HighLoad++ — про инженерию больших систем, в программе есть секция «SRE и эксплуатация систем». DevOpsConf — про разработку, тестирование и эксплуатацию."
+status: active
+added: 2026-10-09
+verified: 2026-10-09

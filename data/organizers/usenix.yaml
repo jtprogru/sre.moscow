@@ -1,0 +1,24 @@
+name: USENIX
+kind: conference-organizer
+links:
+  - kind: events
+    url: https://www.usenix.org/srecon
+    label: SREcon
+  - kind: recordings
+    url: https://www.youtube.com/@UsenixOrg
+    label: YouTube
+  - kind: cfp
+    url: https://www.usenix.org/conference/srecon27americas/call-for-participation
+    label: SREcon27 Americas
+series:
+  - name: SREcon
+    url: https://www.usenix.org/srecon
+    cadence: "дважды в год: Americas весной, EMEA осенью"
+formats: [offline]
+cities: [Дублин, Сиэтл]
+lang: en
+topics: [incidents, resilience, observability, performance, culture]
+why: "SREcon — профильная конференция по SRE. Слайды и видео докладов выкладывают в открытый доступ через несколько недель после события."
+status: active
+added: 2026-10-09
+verified: 2026-10-09

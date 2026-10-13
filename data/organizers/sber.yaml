@@ -1,0 +1,14 @@
+name: Сбер
+kind: company
+links:
+  - kind: events
+    url: https://developers.sber.ru/kak-v-sbere/events
+    label: Календарь IT-событий
+formats: [offline, online]
+cities: [Москва, Санкт-Петербург]
+lang: ru
+topics: [platform, automation]
+why: "Календарь митапов и конференций Сбера с фильтром по направлениям, среди них SRE и DevOps. Встречи идут в офисах в Москве и Петербурге и онлайн."
+status: active
+added: 2026-10-09
+verified: 2026-10-09

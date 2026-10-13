@@ -1,0 +1,26 @@
+name: Yandex Infrastructure
+kind: company
+links:
+  - kind: events
+    url: https://infra.yandex.ru/events
+  - kind: recordings
+    url: https://www.youtube.com/@YandexInfrastructure
+    label: YouTube
+  - kind: announcements
+    url: https://t.me/yandex_infrastructure
+    label: Telegram
+series:
+  - name: infra.conf
+    url: https://infra.yandex.ru/event/infraconf
+    cadence: раз в год, июнь
+  - name: nexthop
+    url: https://infra.yandex.ru/event/nexthop
+    cadence: раз в год, ноябрь
+formats: [hybrid]
+cities: [Москва]
+lang: ru
+topics: [resilience, incidents, platform, networking]
+why: "infra.conf — про создание и эксплуатацию высоконагруженных систем: надёжность, доступность, инциденты. nexthop — ежегодная конференция для сетевых инженеров."
+status: active
+added: 2026-10-09
+verified: 2026-10-09

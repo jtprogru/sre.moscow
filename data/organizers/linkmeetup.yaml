@@ -1,0 +1,16 @@
+name: linkmeetup
+kind: community
+links:
+  - kind: events
+    url: https://linkmeetup.ru/
+series:
+  - name: linkmeetup
+    cadence: один-два раза в год
+formats: [offline]
+cities: [Москва, Новосибирск]
+lang: ru
+topics: [networking, resilience]
+why: "Митап «от IT для IT»: три зала инженерных докладов про сети, серверы, ИБ и SRE плюс нетворкинг. Проходит раз-два в год в Москве и Новосибирске."
+status: active
+added: 2026-10-09
+verified: 2026-10-09
