@@ -1,0 +1,278 @@
+---
+import { SECTIONS } from '../lib/search';
+import { NAV } from '../lib/site';
+import Icon from './Icon.astro';
+
+// Окно поиска по каталогу. Открывается строкой поиска в шапке, сочетанием
+// Ctrl+K или ⌘K и клавишей «/» вне полей ввода. Индекс — /search.json,
+// загружается при первом открытии.
+//
+// Без JS окно не открыть, поэтому строка поиска в шапке отрисована скрытой
+// и показывается этим же скриптом, как фильтры.
+
+// Области поиска — каталоги из словаря разделов, с теми же названиями.
+const scopes = SECTIONS.map((id) => {
+  const section = NAV.find((item) => item.href === `/${id}/`)!;
+  return { id, label: section.label, icon: section.icon };
+});
+---
+
+<dialog class="search" data-search aria-label="Поиск по каталогу">
+  <div class="search__head">
+    <label class="search__field">
+      <Icon name="search" />
+      <span class="visually-hidden">Что найти</span>
+      <input
+        type="search"
+        data-search-input
+        placeholder="Поиск по каталогу"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        enterkeyhint="search"
+        role="combobox"
+        aria-expanded="false"
+        aria-controls="search-results"
+        aria-autocomplete="list"
+      />
+    </label>
+    <button class="icon-button" type="button" data-search-close aria-label="Закрыть поиск">
+      <Icon name="x" />
+    </button>
+  </div>
+
+  <fieldset class="search__scopes" data-search-scopes>
+    <legend class="visually-hidden">Где искать</legend>
+    <label class="choice choice--pill">
+      <input type="radio" name="search-scope" value="" checked />
+      <span>Все</span>
+    </label>
+    {
+      scopes.map((scope) => (
+        <label class="choice choice--pill">
+          <input type="radio" name="search-scope" value={scope.id} data-label={scope.label} data-icon={scope.icon} />
+          <span>{scope.label}</span>
+        </label>
+      ))
+    }
+  </fieldset>
+
+  <p class="search__status" data-search-status role="status"></p>
+  <div class="search__results" id="search-results" data-search-results role="listbox" aria-label="Найденное"></div>
+</dialog>
+
+<script>
+  import { ICONS, type IconName } from '../lib/icons';
+  import { prepare, search, type SearchEntry, type SearchRecord, type SectionId } from '../lib/search';
+
+  const MIN_QUERY = 2;
+  const LIMIT = 50;
+
+  const HINT = 'Ищу по названию, спикеру, городу и теме. Хватит двух букв.';
+  const LOADING = 'Загружаю каталог…';
+  const FAILED = 'Каталог не загрузился. Проверь сеть и открой поиск ещё раз.';
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-search]');
+  const input = dialog?.querySelector<HTMLInputElement>('[data-search-input]');
+  const status = dialog?.querySelector<HTMLElement>('[data-search-status]');
+  const list = dialog?.querySelector<HTMLElement>('[data-search-results]');
+
+  if (dialog && input && status && list && typeof dialog.showModal === 'function') {
+    const scopes = [...dialog.querySelectorAll<HTMLInputElement>('input[name="search-scope"]')];
+    const sections = new Map(scopes.filter((scope) => scope.value).map((scope) => [scope.value as SectionId, scope]));
+
+    let index: SearchEntry[] | undefined;
+    let loading: Promise<void> | undefined;
+    let options: HTMLAnchorElement[] = [];
+    let active = -1;
+
+    const load = (): Promise<void> =>
+      (loading ??= fetch('/search.json')
+        .then((response) => {
+          if (!response.ok) throw new Error(String(response.status));
+          return response.json() as Promise<SearchRecord[]>;
+        })
+        .then((records) => {
+          index = prepare(records);
+        })
+        .catch(() => {
+          // Следующее открытие окна попробует ещё раз.
+          loading = undefined;
+        }));
+
+    const activate = (next: number, scroll = true) => {
+      options[active]?.setAttribute('aria-selected', 'false');
+      active = next;
+      const option = options[active];
+      if (!option) {
+        input.removeAttribute('aria-activedescendant');
+        return;
+      }
+      option.setAttribute('aria-selected', 'true');
+      input.setAttribute('aria-activedescendant', option.id);
+      if (scroll) option.scrollIntoView({ block: 'nearest' });
+    };
+
+    const element = <K extends keyof HTMLElementTagNameMap>(tag: K, className: string, text = '') => {
+      const node = document.createElement(tag);
+      node.className = className;
+      node.textContent = text;
+      return node;
+    };
+
+    const group = (type: SectionId, records: SearchRecord[]) => {
+      const scope = sections.get(type);
+      const label = scope?.dataset.label ?? type;
+
+      const box = element('div', 'search__group');
+      box.setAttribute('role', 'group');
+      box.setAttribute('aria-label', label);
+
+      const title = element('p', 'search__group-title eyebrow');
+      title.setAttribute('aria-hidden', 'true');
+      // Контур иконки — константа из src/lib/icons.ts, не данные каталога.
+      const icon = ICONS[scope?.dataset.icon as IconName] ?? '';
+      title.innerHTML = `<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icon}</svg>`;
+      title.append(`${label} · ${records.length}`);
+      box.append(title);
+
+      for (const record of records) {
+        const option = element('a', 'search__option');
+        option.href = record.url;
+        option.id = `search-option-${options.length}`;
+        option.setAttribute('role', 'option');
+        option.setAttribute('aria-selected', 'false');
+        option.append(element('span', 'search__option-title', record.title));
+        if (record.sub) option.append(element('span', 'search__option-sub', record.sub));
+        options.push(option);
+        box.append(option);
+      }
+      return box;
+    };
+
+    const render = () => {
+      const query = input.value.trim();
+      const scope = scopes.find((item) => item.checked)?.value as SectionId | '' | undefined;
+
+      list.replaceChildren();
+      options = [];
+      activate(-1);
+
+      const done = (text: string) => {
+        status.textContent = text;
+        input.setAttribute('aria-expanded', String(options.length > 0));
+      };
+
+      if (query.length < MIN_QUERY) return done(HINT);
+      if (!index) return done(loading ? LOADING : FAILED);
+
+      const found = search(index, query, scope || undefined);
+      if (found.length === 0) {
+        return done(scope ? 'В этом разделе ничего не нашлось. Попробуй «Все».' : 'Ничего не нашлось. Попробуй другое слово или его начало.');
+      }
+
+      // Группы идут в порядке лучшего совпадения: раздел с самой подходящей
+      // записью оказывается первым.
+      const groups = new Map<SectionId, SearchRecord[]>();
+      for (const record of found.slice(0, LIMIT)) {
+        const records = groups.get(record.type) ?? [];
+        records.push(record);
+        groups.set(record.type, records);
+      }
+      list.append(...[...groups].map(([type, records]) => group(type, records)));
+
+      activate(0, false);
+      list.scrollTop = 0;
+      done(found.length > LIMIT ? `Найдено: ${found.length}. Показаны первые ${LIMIT}, уточни запрос.` : `Найдено: ${found.length}`);
+    };
+
+    const open = () => {
+      if (dialog.open) return;
+      // Поиск открыли из меню на телефоне — меню своё дело сделало.
+      for (const other of document.querySelectorAll<HTMLDialogElement>('dialog[open]')) other.close();
+      // Со страницы раздела ищем сначала в нём.
+      const here = [...sections].find(([id]) => location.pathname.startsWith(`/${id}/`))?.[1];
+      (here ?? scopes[0]).checked = true;
+
+      dialog.showModal();
+      input.select();
+      render();
+      if (!index) void load().then(render);
+    };
+
+    const follow = (option: HTMLAnchorElement) => {
+      dialog.close();
+      location.assign(option.href);
+    };
+
+    const editable = (target: EventTarget | null): boolean =>
+      target instanceof HTMLElement && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
+
+    document.addEventListener('keydown', (event) => {
+      // По физической клавише: в русской раскладке на ней «л», а сочетание то же.
+      if ((event.metaKey || event.ctrlKey) && !event.altKey && !event.shiftKey && event.code === 'KeyK') {
+        event.preventDefault();
+        if (dialog.open) dialog.close();
+        else open();
+      } else if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey && !dialog.open && !editable(event.target)) {
+        event.preventDefault();
+        open();
+      }
+    });
+
+    input.addEventListener('input', render);
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        if (options.length === 0) return;
+        const step = event.key === 'ArrowDown' ? 1 : -1;
+        activate((active + step + options.length) % options.length);
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        const option = options[active];
+        if (option) follow(option);
+      } else if (event.key === 'Escape') {
+        // Поле type="search" по Esc сначала очищает себя и окно не закрывает.
+        // Здесь Esc всегда закрывает окно с первого нажатия.
+        event.preventDefault();
+        dialog.close();
+      }
+    });
+
+    for (const scope of scopes) scope.addEventListener('change', render);
+
+    // После выбора области мышью или пальцем печатать можно сразу. С клавиатуры
+    // фокус остаётся в переключателе: стрелки должны листать области дальше.
+    dialog.querySelector('[data-search-scopes]')?.addEventListener('pointerup', () => {
+      requestAnimationFrame(() => input.focus());
+    });
+
+    list.addEventListener('pointermove', (event) => {
+      const option = (event.target as Element).closest<HTMLAnchorElement>('[role="option"]');
+      const position = option ? options.indexOf(option) : -1;
+      if (position !== -1 && position !== active) activate(position, false);
+    });
+
+    // Ссылка на якорь этой же страницы страницу не перезагружает — окно нужно
+    // закрыть самим.
+    list.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('[role="option"]')) dialog.close();
+    });
+
+    dialog.querySelector('[data-search-close]')?.addEventListener('click', () => dialog.close());
+
+    // Клик по затемнению вокруг окна: цель события — сам dialog.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    const mac = /Mac|iPhone|iPad/.test(navigator.platform);
+    for (const hint of document.querySelectorAll<HTMLElement>('[data-search-kbd]')) hint.textContent = mac ? '⌘K' : 'Ctrl K';
+
+    for (const trigger of document.querySelectorAll<HTMLElement>('[data-search-open]')) {
+      trigger.hidden = false;
+      trigger.addEventListener('click', open);
+    }
+  }
+</script>
