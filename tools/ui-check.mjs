@@ -22,10 +22,15 @@
  * Движок, которого на машине нет, пропускается с предупреждением. С флагом
  * --strict и в CI это ошибка. Поставить движки: bunx playwright install.
  *
+ * Проверка идёт минуты, поэтому не молчит: сначала план, потом строка на
+ * каждый прогон «движок-экран-тема» с его временем и числом нарушений. В
+ * GitHub Actions итог виден и без лога: нарушения уходят аннотациями, отчёт
+ * с таблицей прогонов — на страницу запуска.
+ *
  * Запускается через Node: на него рассчитан Playwright.
  */
 
-import { existsSync, mkdirSync, readFileSync, rmSync, statSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, relative, resolve, sep } from 'node:path';
 import process from 'node:process';
@@ -83,6 +88,61 @@ export function pagesOf(dist) {
     .filter((path) => path.endsWith('.html'))
     .map((path) => `/${relative(dist, path).split(sep).join('/')}`.replace(/index\.html$/, ''))
     .sort();
+}
+
+/** Время словами: «6.1 с», «4 мин 3 с». */
+export const duration = (ms) => {
+  const seconds = Math.round(ms / 1000);
+  return ms < 59_950 ? `${(ms / 1000).toFixed(1)} с` : `${Math.floor(seconds / 60)} мин ${seconds % 60} с`;
+};
+
+/**
+ * Где встретилось нарушение, без повторов: в каких прогонах и на каких
+ * страницах. Восемьдесят мест читаются как «четыре прогона, все страницы».
+ */
+export function whereabouts(places, limit = 4) {
+  const list = (items) => {
+    const unique = [...new Set(items)];
+    return unique.slice(0, limit).join(', ') + (unique.length > limit ? ` и ещё ${unique.length - limit}` : '');
+  };
+  return { runs: list(places.map((place) => place.run)), pages: list(places.map((place) => place.path)) };
+}
+
+// Команды GitHub Actions читаются из лога построчно, служебные символы в них
+// экранируются: docs.github.com/actions/reference/workflow-commands-for-github-actions
+const commandData = (text) => text.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+const commandProperty = (text) => commandData(text).replace(/:/g, '%3A').replace(/,/g, '%2C');
+
+/** Нарушение аннотацией: GitHub покажет её на странице запуска и во вкладке Checks у PR. */
+export const annotation = (violation, places) => {
+  const where = whereabouts(places);
+  return `::error title=${commandProperty('make ui-check')}::${commandData(`${violation}. Прогоны: ${where.runs}. Страницы: ${where.pages}`)}`;
+};
+
+/** Ячейка таблицы в markdown: в названиях нарушений стоят теги вроде <a>. */
+const cell = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\|/g, '\\|');
+
+/**
+ * Отчёт для страницы запуска в GitHub Actions: вердикт, нарушения и время
+ * каждого прогона.
+ */
+export function report({ pages, loads, elapsed, runs, violations, skipped }) {
+  const verdict = violations.size ? `вёрстка расходится с правилами (${violations.size})` : skipped.length ? 'проверено не во всех движках' : 'вёрстка в порядке';
+  const lines = [`## make ui-check: ${verdict}`, '', `Страниц ${pages}, прогонов ${runs.length}, загрузок ${loads}, время ${duration(elapsed)}.`, ''];
+  if (skipped.length) lines.push(`Не проверено в ${skipped.join(', ')}: движок не запустился.`, '');
+
+  if (violations.size) {
+    lines.push('### Нарушения', '', '| Нарушение | Прогоны | Страницы |', '| --- | --- | --- |');
+    for (const [violation, places] of violations) {
+      const where = whereabouts(places);
+      lines.push(`| ${cell(violation)} | ${cell(where.runs)} | ${cell(where.pages)} |`);
+    }
+    lines.push('');
+  }
+
+  lines.push('### Прогоны', '', '| Прогон | Время | Нарушений |', '| --- | ---: | ---: |');
+  for (const run of runs) lines.push(`| ${run.name} | ${duration(run.ms)} | ${run.violations} |`);
+  return `${lines.join('\n')}\n`;
 }
 
 /**
@@ -272,28 +332,46 @@ async function main() {
 
   if (shots) rmSync(out, { recursive: true, force: true });
 
-  /** нарушение → где встретилось */
+  // Прогон — один движок на одном экране в одной теме: все страницы подряд.
+  const plan = engines.map((engine) => ({ engine, screens: profiles.filter((item) => item.engines.includes(engine)) }));
+  const names = plan.flatMap(({ engine, screens }) => screens.flatMap((profile) => THEMES.map((theme) => `${engine}-${profile.name}-${theme}`)));
+  const total = names.length;
+  const pad = Math.max(0, ...names.map((name) => name.length));
+  const started = Date.now();
+
+  /** нарушение → где встретилось: [{ path, run }] */
   const violations = new Map();
-  const note = (rule, detail, where) => {
+  /** нарушения текущего прогона */
+  let hits = new Set();
+  const note = (rule, detail, path, run) => {
     const key = `${rule}: ${detail}`;
-    violations.set(key, [...(violations.get(key) ?? []), where]);
+    violations.set(key, [...(violations.get(key) ?? []), { path, run }]);
+    hits.add(key);
   };
   const skipped = [];
+  const runs = [];
   let loads = 0;
+  let done = 0;
 
-  for (const engine of engines) {
+  console.log(`Вёрстка: страниц ${pages.length}, прогонов ${total} — ${plan.map(({ engine, screens }) => `${engine}: ${screens.length * THEMES.length}`).join(', ')}. Ниже строка на прогон: движок, экран, тема.`);
+
+  for (const { engine, screens } of plan) {
     let browser;
     try {
       browser = await playwright[engine].launch();
     } catch (error) {
       skipped.push(engine);
+      done += screens.length * THEMES.length;
       console.warn(`! ${engine} не запустился и пропущен: ${String(error.message).split('\n')[0]}`);
       continue;
     }
+    console.log(`${engine} ${browser.version()}`);
 
-    for (const profile of profiles.filter((item) => item.engines.includes(engine))) {
+    for (const profile of screens) {
       for (const theme of THEMES) {
         const run = `${engine}-${profile.name}-${theme}`;
+        const began = Date.now();
+        hits = new Set();
         const context = await browser.newContext({
           viewport: { width: profile.width, height: profile.height },
           colorScheme: theme,
@@ -303,10 +381,10 @@ async function main() {
         });
         const page = await context.newPage();
         let current = '';
-        page.on('pageerror', (error) => note('ошибка в скрипте', error.message, `${current} · ${run}`));
+        page.on('pageerror', (error) => note('ошибка в скрипте', error.message, current, run));
         page.on('console', (message) => {
           // 404-я страница законно получает 404 на свой адрес.
-          if (message.type() === 'error' && !/404/.test(message.text())) note('ошибка в консоли', message.text(), `${current} · ${run}`);
+          if (message.type() === 'error' && !/404/.test(message.text())) note('ошибка в консоли', message.text(), current, run);
         });
 
         if (shots) mkdirSync(join(out, run), { recursive: true });
@@ -316,7 +394,7 @@ async function main() {
           await page.goto(base + path, { waitUntil: 'networkidle' });
           await page.evaluate(() => document.fonts.ready);
           loads += 1;
-          for (const { rule, detail } of await page.evaluate(audit, { touch: profile.touch, width: profile.width })) note(rule, detail, `${path} · ${run}`);
+          for (const { rule, detail } of await page.evaluate(audit, { touch: profile.touch, width: profile.width })) note(rule, detail, path, run);
           if (shots) await page.screenshot({ path: join(out, run, `${slug(path)}.jpg`), type: 'jpeg', quality: 80, fullPage: true });
         }
 
@@ -324,34 +402,46 @@ async function main() {
         if (theme === 'light' && pages.includes('/')) {
           current = '/';
           await page.goto(`${base}/`, { waitUntil: 'networkidle' });
-          for (const problem of await searchByKeyboard(page)) note('поиск с клавиатуры', problem, `/ · ${run}`);
+          for (const problem of await searchByKeyboard(page)) note('поиск с клавиатуры', problem, '/', run);
           if (profile.width < 768) {
             await page.goto(`${base}/`, { waitUntil: 'networkidle' });
-            for (const problem of await menuByKeyboard(page)) note('меню с клавиатуры', problem, `/ · ${run}`);
+            for (const problem of await menuByKeyboard(page)) note('меню с клавиатуры', problem, '/', run);
           }
         }
         if (theme === 'light' && pages.includes(CATALOG)) {
           current = CATALOG;
           await page.goto(base + CATALOG, { waitUntil: 'networkidle' });
-          for (const problem of await catalogControls(page, profile.width)) note('каталог', problem, `${CATALOG} · ${run}`);
+          for (const problem of await catalogControls(page, profile.width)) note('каталог', problem, CATALOG, run);
         }
         await context.close();
+
+        done += 1;
+        const ms = Date.now() - began;
+        runs.push({ name: run, ms, violations: hits.size });
+        console.log(`  [${String(done).padStart(String(total).length)}/${total}] ${run.padEnd(pad)} ${duration(ms).padStart(7)}  ${hits.size ? `✗ нарушений: ${hits.size}` : '✓'}`);
       }
     }
     await browser.close();
   }
   server.close();
 
+  const elapsed = Date.now() - started;
   const ran = engines.filter((engine) => !skipped.includes(engine));
-  const summary = `страниц ${pages.length}, загрузок ${loads}, движки: ${ran.join(', ') || 'ни одного'}`;
+  const summary = `страниц ${pages.length}, прогонов ${runs.length}, загрузок ${loads}, движки: ${ran.join(', ') || 'ни одного'}, время: ${duration(elapsed)}`;
 
   if (violations.size) {
     console.error(`Вёрстка расходится с правилами (${violations.size}); ${summary}:`);
-    for (const [violation, where] of violations) {
+    for (const [violation, places] of violations) {
+      const where = whereabouts(places);
       console.error(`  ✗ ${violation}`);
-      console.error(`      ${where.slice(0, 3).join('; ')}${where.length > 3 ? ` и ещё ${where.length - 3}` : ''}`);
+      console.error(`      прогоны: ${where.runs}`);
+      console.error(`      страницы: ${where.pages}`);
     }
   }
+
+  // Аннотаций GitHub берёт десять на шаг, остальные нарушения — в отчёте и в логе.
+  if (process.env.GITHUB_ACTIONS) for (const [violation, places] of [...violations].slice(0, 10)) console.log(annotation(violation, places));
+  if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, report({ pages: pages.length, loads, elapsed, runs, violations, skipped }));
   if (skipped.length) {
     console.warn(`! Не проверено в ${skipped.join(', ')}: движок не установлен. Поставить: bunx playwright install ${skipped.join(' ')}`);
   }

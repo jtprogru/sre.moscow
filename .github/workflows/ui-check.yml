@@ -32,6 +32,9 @@ jobs:
   ui:
     name: make ui-check
     runs-on: ubuntu-latest
+    # Обычный прогон — пять-шесть минут. Зависший браузер не должен молчать
+    # шесть часов, пока GitHub сам не снимет задачу.
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -55,11 +58,14 @@ jobs:
       - name: Install browsers
         run: bunx playwright install --with-deps chromium firefox webkit
 
-      # При CI=true движок, который не запустился, роняет проверку
+      # При CI=true движок, который не запустился, роняет проверку. По ходу
+      # проверка печатает строку на каждый прогон, нарушения уходят аннотациями,
+      # отчёт с таблицей прогонов — на страницу запуска.
       - name: Check
         run: make ui-check
 
       - name: Upload screenshots
+        id: shots
         if: always()
         uses: actions/upload-artifact@v7
         with:
@@ -67,3 +73,10 @@ jobs:
           path: ui-check/
           retention-days: 7
           if-no-files-found: ignore
+
+      # Ссылка на скриншоты стоит в том же отчёте, под таблицей прогонов
+      - name: Link screenshots in summary
+        if: always() && steps.shots.outputs.artifact-url
+        env:
+          SHOTS_URL: ${{ steps.shots.outputs.artifact-url }}
+        run: echo "Скриншоты всех страниц — в [артефакте ui-check]($SHOTS_URL)." >> "$GITHUB_STEP_SUMMARY"
