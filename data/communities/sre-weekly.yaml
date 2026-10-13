@@ -1,0 +1,10 @@
+title: SRE Weekly
+kind: newsletter
+platform: email
+url: https://sreweekly.com/
+lang: en
+description: "Еженедельная рассылка со ссылками на статьи и разборы инцидентов: масштабирование, доступность, реагирование на инциденты, автоматизация."
+topics: [incidents, postmortems, resilience, automation]
+status: active
+added: 2026-10-09
+verified: 2026-10-09

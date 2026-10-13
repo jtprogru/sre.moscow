@@ -1,0 +1,10 @@
+title: Церковь метрик
+kind: chat
+platform: telegram
+url: https://t.me/metrics_ru
+lang: ru
+description: "Чат про метрики и мониторинг: Prometheus, Graphite, Influx, Moira, Grafana, Netdata."
+topics: [monitoring, observability]
+status: active
+added: 2026-10-09
+verified: 2026-10-09

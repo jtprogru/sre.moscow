@@ -1,0 +1,10 @@
+title: Мониторим ИТ
+kind: channel
+platform: telegram
+url: https://t.me/monitorim_it
+lang: ru
+description: "Канал о наблюдаемости: логи, трейсы, метрики. Новости и разборы по OpenTelemetry, Grafana, Zabbix и смежным инструментам."
+topics: [observability, monitoring]
+status: active
+added: 2026-10-09
+verified: 2026-10-09

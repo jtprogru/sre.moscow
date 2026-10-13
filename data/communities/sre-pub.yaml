@@ -1,0 +1,10 @@
+title: SRE Pub
+kind: chat
+platform: telegram
+url: https://t.me/sre_pub
+lang: ru
+description: "Русскоязычный чат про SRE: разговоры о надёжности, эксплуатации и инфраструктуре."
+topics: [resilience, culture]
+status: active
+added: 2026-10-09
+verified: 2026-10-09

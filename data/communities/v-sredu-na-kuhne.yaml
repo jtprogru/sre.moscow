@@ -1,0 +1,10 @@
+title: В SREду на кухне
+kind: podcast
+platform: youtube
+url: https://www.youtube.com/playlist?list=PLknJ4Vr6efQGz5LIO9taObaoNK_Mld6F4
+lang: ru
+description: "Подкаст AvitoTech: инженеры Авито и гости обсуждают, что такое SRE и как его готовить. Выпуски про SLO и error budget, инциденты, релизы, chaos engineering, цену надёжности."
+topics: [slo, incidents, releases, chaos, cost]
+status: active
+added: 2026-10-09
+verified: 2026-10-09

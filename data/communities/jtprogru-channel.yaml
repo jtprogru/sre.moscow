@@ -1,0 +1,10 @@
+title: Мишка на сервере
+kind: channel
+platform: telegram
+url: https://t.me/jtprogru_channel
+lang: ru
+description: "Авторский канал Head of SRE о надёжности из практики: SLO и error budget, алертинг, разборы инцидентов, устойчивость систем. Рядом заметки про инструменты и базу знаний."
+topics: [slo, incidents, monitoring, resilience, culture]
+status: active
+added: 2026-10-12
+verified: 2026-10-12

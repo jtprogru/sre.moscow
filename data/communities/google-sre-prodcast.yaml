@@ -1,0 +1,10 @@
+title: Google SRE Prodcast
+kind: podcast
+platform: web
+url: https://sre.google/prodcast/
+lang: en
+description: "Подкаст Google про SRE и продакшен-системы: разговоры с инженерами об инцидентах, сложных системах и практике эксплуатации."
+topics: [incidents, resilience, culture]
+status: active
+added: 2026-10-09
+verified: 2026-10-09
