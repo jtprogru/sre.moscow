@@ -20,8 +20,9 @@
  *
  *   node tools/ui-check.mjs [--engine chromium] [--profile laptop] [--page /people/] [--no-shots] [--strict]
  *
- * Движок, которого на машине нет, пропускается с предупреждением. С флагом
- * --strict и в CI это ошибка. Поставить движки: bunx playwright install.
+ * Движки — dev-зависимости @playwright/browser-*, их ставит make install.
+ * Движок, который не запустился, пропускается с предупреждением. С флагом
+ * --strict и в CI это ошибка.
  *
  * Проверка идёт минуты, поэтому не молчит: сначала план, потом строка на
  * каждый прогон с его временем и числом нарушений. Прогон — «движок-экран-тема»
@@ -458,7 +459,7 @@ async function main() {
   if (process.env.GITHUB_ACTIONS) for (const [violation, places] of [...violations].slice(0, 10)) console.log(annotation(violation, places));
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, report({ pages: pages.length, loads, elapsed, runs, violations, skipped }));
   if (skipped.length) {
-    console.warn(`! Не проверено в ${skipped.join(', ')}: движок не установлен. Поставить: bunx playwright install ${skipped.join(' ')}`);
+    console.warn(`! Не проверено в ${skipped.join(', ')}: движок не установлен. Движки ставит make install, докачать руками: bunx playwright install ${skipped.join(' ')}`);
   }
   if (violations.size || (strict && skipped.length) || ran.length === 0) process.exit(1);
 

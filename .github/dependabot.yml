@@ -11,6 +11,13 @@ updates:
     commit-message:
       prefix: "build(deps)"
     open-pull-requests-limit: 5
+    groups:
+      # Браузеры ставятся пакетами @playwright/browser-* той же версии, что
+      # и сам playwright: по одному их обновлять нельзя.
+      playwright:
+        patterns:
+          - "playwright"
+          - "@playwright/*"
     ignore:
       # typescript держится на 6.x, пока `astro check` не умеет работать с 7.
       # Нативный компилятор TypeScript 7 не отдаёт программный API, на котором

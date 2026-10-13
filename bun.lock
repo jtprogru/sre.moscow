@@ -11,6 +11,9 @@
       },
       "devDependencies": {
         "@astrojs/check": "^0.9.10",
+        "@playwright/browser-chromium": "1.62.1",
+        "@playwright/browser-firefox": "1.62.1",
+        "@playwright/browser-webkit": "1.62.1",
         "ical.js": "^2.2.1",
         "markdownlint-cli2": "^0.23.3",
         "playwright": "1.62.1",
@@ -19,6 +22,11 @@
       },
     },
   },
+  "trustedDependencies": [
+    "@playwright/browser-chromium",
+    "@playwright/browser-firefox",
+    "@playwright/browser-webkit",
+  ],
   "packages": {
     "@astrojs/astro2tsx": ["@astrojs/astro2tsx@0.1.2", "", { "dependencies": { "@emnapi/core": "1.11.3", "@napi-rs/wasm-runtime": "1.2.4" } }, "sha512-Uj/M9zbrhu5cIZEvWAGTbQJRKSxXWJ/E59BZwt7F+chrKhbfttW+9rkS/l+1QxoJP1KU3UnpM62M7yszfAI0WA=="],
 
@@ -181,6 +189,12 @@
     "@oslojs/encoding": ["@oslojs/encoding@1.1.0", "", {}, "sha512-70wQhgYmndg4GCPxPPxPGevRKqTIJ2Nh4OkiMWmDAVYsTQ+Ta7Sq+rPevXyXGdzr30/qZBnyOalCszoMxlyldQ=="],
 
     "@oxc-project/types": ["@oxc-project/types@0.153.0", "", {}, "sha512-jSNrRIyvPVLL5E1z/tS5zLAprosGz/FuI1PWwEOz59j3E4TTTzSpqKb/RDGqJhhW0QHYISGXxq582wGx6T11Tw=="],
+
+    "@playwright/browser-chromium": ["@playwright/browser-chromium@1.62.1", "", { "dependencies": { "playwright-core": "1.62.1" } }, "sha512-DU/t4TSqHvAc+uFMt972forQYqBTh/ul7lZ8U81HYGyxnf6vSPPz9NzuE0OR3x/elqvvGm+n4gcny+QSKT+FDw=="],
+
+    "@playwright/browser-firefox": ["@playwright/browser-firefox@1.62.1", "", { "dependencies": { "playwright-core": "1.62.1" } }, "sha512-G0gm1k5oWiz1zMaL18a6z2QJc/D/yhKzOBBC07E4LgQbhmMTtmsrbV34cwnqEEbp5HuHTML4HkFzATcpt2C6eQ=="],
+
+    "@playwright/browser-webkit": ["@playwright/browser-webkit@1.62.1", "", { "dependencies": { "playwright-core": "1.62.1" } }, "sha512-l2a47u3gcbBoLqal5vjR4a4cRnKZeq4qIspdov7v9s7FY9qWXwZCrlYZjsDB6E6gxXcRjvGK9Y/Nb62h2sBuDg=="],
 
     "@rolldown/binding-android-arm-eabi": ["@rolldown/binding-android-arm-eabi@1.2.13", "", { "os": "android", "cpu": "arm" }, "sha512-Vu/NICrgdRvUOeaJZIyB2FP63s6fO/4ud5l8dXmxDx9yDyn+mN0y+gsvsVviSli+T361Aqo0h46EuMoobrwawA=="],
 

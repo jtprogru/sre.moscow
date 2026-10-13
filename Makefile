@@ -23,8 +23,11 @@ help: ## Показать доступные команды
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
+# Вместе с зависимостями ставятся Chromium, Firefox и WebKit: их качают пакеты
+# @playwright/browser-*. Не скачался браузер — падает вся установка, поэтому
+# подсказка: без браузеров работает всё, кроме ui-check и cover.
 node_modules: package.json bun.lock
-	bun install $(BUN_INSTALL_FLAGS)
+	bun install $(BUN_INSTALL_FLAGS) || { echo "Если упала загрузка браузера, а make ui-check и make cover тебе не нужны: PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 make install" >&2; exit 1; }
 	@touch node_modules
 
 install: node_modules ## Установить зависимости
@@ -78,8 +81,9 @@ check: lint contrast copy-check test data-check typecheck build ics-check copy-c
 
 # Вёрстка в браузерах по матрице экранов: прокрутка, цели под палец, мелкий
 # текст, шапка, клавиатура. В make check не входит: нужны Node и движки
-# Playwright, а PR с одной записью в data/ ждать их не должен. Движки ставит
-# bunx playwright install; каких нет — пропускаются, в CI это ошибка.
+# Playwright, а PR с одной записью в data/ ждать их не должен. Все три
+# движка — dev-зависимости @playwright/browser-*, их ставит make install;
+# движок, который не запустился, пропускается, в CI это ошибка.
 ui-check: build ## Проверить вёрстку в браузерах, скриншоты — в ui-check/
 	node tools/ui-check.mjs
 

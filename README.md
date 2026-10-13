@@ -63,14 +63,16 @@ make check
 Нужен [bun](https://bun.sh/) 1.4 или новее и `make`.
 
 ```bash
-make install   # зависимости
+make install   # зависимости и браузеры для make ui-check
 make dev       # http://localhost:4321/
 make check     # всё, что гоняет CI на PR
-make ui-check  # вёрстка в браузерах: нужны Node и движки Playwright
+make ui-check  # вёрстка в Chromium, Firefox и WebKit: нужен Node
 make help      # остальные цели
 ```
 
 `Makefile` — единственная точка входа: workflow в CI зовут те же цели, что и ты локально.
+
+`make install` вместе с зависимостями качает Chromium, Firefox и WebKit для `make ui-check`. Если правишь только `data/` и браузеры тебе не нужны, поставь без них: `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 make install`.
 
 ## Как устроено
 
