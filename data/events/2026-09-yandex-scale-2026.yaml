@@ -1,0 +1,13 @@
+title: Yandex Scale 2026
+start: 2026-09-24
+format: hybrid
+city: Москва
+country: RU
+lang: ru
+url: https://scale.yandex.cloud/
+organizer:
+  name: Yandex Cloud
+price: free
+topics: [platform, kubernetes, databases]
+series: Yandex Scale
+added: 2026-10-09

@@ -1,0 +1,15 @@
+title: DevOpsConf 2025
+start: 2025-04-07
+end: 2025-04-08
+format: hybrid
+city: Москва
+country: RU
+lang: ru
+url: https://devopsconf.io/moscow/2025
+organizer:
+  name: Онтико
+  ref: ontico
+price: paid
+topics: [slo, incidents, chaos, observability]
+series: DevOpsConf
+added: 2026-10-09

@@ -1,0 +1,14 @@
+title: linkmeetup v9.0
+start: 2026-10-15
+format: offline
+city: Москва
+country: RU
+lang: ru
+url: https://linkmeetup.ru/
+organizer:
+  name: linkmeetup
+  ref: linkmeetup
+price: paid
+topics: [networking, automation, monitoring, kubernetes]
+series: linkmeetup
+added: 2026-10-09

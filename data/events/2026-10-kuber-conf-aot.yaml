@@ -1,0 +1,14 @@
+title: Kuber Conf от АОТ
+start: 2026-10-22
+format: offline
+city: Москва
+country: RU
+lang: ru
+url: https://aot-kuberconf.ru/
+organizer:
+  name: АОТ
+  ref: aot
+price: paid
+topics: [kubernetes, platform, incidents, automation]
+series: Kuber Conf от АОТ
+added: 2026-10-09

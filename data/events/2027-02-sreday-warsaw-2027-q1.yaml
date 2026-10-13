@@ -1,0 +1,14 @@
+title: SREday Warsaw 2027 Q1
+start: 2027-02-24
+format: offline
+city: Варшава
+country: PL
+lang: en
+url: https://sreday.com/2027-warsaw-q1/
+organizer:
+  name: SREday
+  ref: sreday
+price: free
+topics: [resilience, observability, incidents, platform]
+series: SREday
+added: 2026-10-09

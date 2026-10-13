@@ -1,0 +1,13 @@
+title: "Kuber Conf'24"
+start: 2024-07-04
+format: hybrid
+city: Москва
+country: RU
+lang: ru
+url: https://kuberconf.io/
+organizer:
+  name: Yandex Cloud
+price: free
+topics: [kubernetes, observability, platform]
+series: Kuber Conf
+added: 2026-10-09

@@ -1,0 +1,15 @@
+title: DevOpsConf 2026
+start: 2026-04-02
+end: 2026-04-03
+format: hybrid
+city: Москва
+country: RU
+lang: ru
+url: https://devopsconf.io/moscow/2026
+organizer:
+  name: Онтико
+  ref: ontico
+price: paid
+topics: [slo, incidents, observability, platform]
+series: DevOpsConf
+added: 2026-10-09

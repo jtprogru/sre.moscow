@@ -1,0 +1,15 @@
+title: SREcon26 Europe/Middle East/Africa
+start: 2026-10-13
+end: 2026-10-15
+format: offline
+city: Дублин
+country: IE
+lang: en
+url: https://www.usenix.org/conference/srecon26emea
+organizer:
+  name: USENIX
+  ref: usenix
+price: paid
+topics: [incidents, slo, observability, performance, culture]
+series: SREcon
+added: 2026-10-09

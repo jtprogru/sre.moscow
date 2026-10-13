@@ -1,0 +1,14 @@
+title: nexthop 2026
+start: 2026-11-26
+format: hybrid
+city: Москва
+country: RU
+lang: ru
+url: https://infra.yandex.ru/event/nexthop
+organizer:
+  name: Yandex Infrastructure
+  ref: yandex-infrastructure
+price: free
+topics: [networking]
+series: nexthop
+added: 2026-10-09

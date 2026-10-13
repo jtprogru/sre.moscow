@@ -1,0 +1,15 @@
+title: DevOpsConf 2024
+start: 2024-03-04
+end: 2024-03-05
+format: hybrid
+city: Москва
+country: RU
+lang: ru
+url: https://devopsconf.io/moscow/2024
+organizer:
+  name: Онтико
+  ref: ontico
+price: paid
+topics: [incidents, resilience, platform, culture]
+series: DevOpsConf
+added: 2026-10-09

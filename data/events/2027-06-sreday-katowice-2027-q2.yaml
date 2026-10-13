@@ -1,0 +1,14 @@
+title: SREday Katowice 2027 Q2
+start: 2027-06-09
+format: offline
+city: Катовице
+country: PL
+lang: en
+url: https://sreday.com/2027-katowice-q2/
+organizer:
+  name: SREday
+  ref: sreday
+price: free
+topics: [resilience, observability, incidents, platform]
+series: SREday
+added: 2026-10-09

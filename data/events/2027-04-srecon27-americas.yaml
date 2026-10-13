@@ -1,0 +1,18 @@
+title: SREcon27 Americas
+start: 2027-04-12
+end: 2027-04-14
+format: offline
+city: Сиэтл
+country: US
+lang: en
+url: https://www.usenix.org/conference/srecon27americas
+organizer:
+  name: USENIX
+  ref: usenix
+cfp:
+  url: https://www.usenix.org/conference/srecon27americas/call-for-participation
+  deadline: 2026-11-19
+price: paid
+topics: [performance, databases, observability, networking, culture]
+series: SREcon
+added: 2026-10-09

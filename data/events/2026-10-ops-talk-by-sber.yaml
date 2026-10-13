@@ -1,0 +1,13 @@
+title: OPS Talk by Sber
+start: 2026-10-19
+format: hybrid
+city: Москва
+country: RU
+lang: ru
+url: https://developers.sber.ru/kak-v-sbere/events/ops_2026
+organizer:
+  name: Сбер
+  ref: sber
+price: free
+topics: [automation, releases, observability, databases]
+added: 2026-10-09

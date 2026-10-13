@@ -1,0 +1,14 @@
+title: "Yandex Go Infra Meetup #2"
+start: 2023-09-02
+format: hybrid
+city: Москва
+country: RU
+lang: ru
+url: https://events.yandex.ru/events/go/infra-2
+organizer:
+  name: Яндекс Go
+  ref: yandex
+price: free
+topics: [resilience, incidents, chaos, databases]
+series: Yandex Go Infra Meetup
+added: 2026-10-09

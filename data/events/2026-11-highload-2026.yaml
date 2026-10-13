@@ -1,0 +1,15 @@
+title: HighLoad++ 2026
+start: 2026-11-30
+end: 2026-12-01
+format: hybrid
+city: Москва
+country: RU
+lang: ru
+url: https://highload.ru/moscow/2026
+organizer:
+  name: Онтико
+  ref: ontico
+price: paid
+topics: [resilience, performance, databases, platform, incidents]
+series: HighLoad++
+added: 2026-10-09
