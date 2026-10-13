@@ -1,0 +1,69 @@
+name: UI check
+
+# Вёрстка в браузерах: `make ui-check` по матрице экранов в Chromium, WebKit
+# и Firefox. Запускается только на изменения в коде сайта: PR с одной записью
+# в data/ вёрстку не меняет и эту проверку не ждёт.
+#
+# Скриншоты всех страниц складываются артефактом, чтобы посмотреть глазами.
+# С эталоном они не сравниваются: сглаживание шрифтов на разных системах разное.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'tools/**'
+      - 'astro.config.mjs'
+      - 'package.json'
+      - 'bun.lock'
+      - 'Makefile'
+      - '.github/workflows/ui-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Новый пуш в PR отменяет предыдущую проверку
+concurrency:
+  group: ui-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ui:
+    name: make ui-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Версия bun — из поля packageManager в package.json
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      # Playwright рассчитан на Node, под bun проверка не запускается
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: make install
+
+      # Версия движков привязана к версии playwright в package.json
+      - name: Install browsers
+        run: bunx playwright install --with-deps chromium firefox webkit
+
+      # При CI=true движок, который не запустился, роняет проверку
+      - name: Check
+        run: make ui-check
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ui-check
+          path: ui-check/
+          retention-days: 7
+          if-no-files-found: ignore
