@@ -1,0 +1,167 @@
+/* ============================================================================
+   sre.moscow · tokens.css — цвет и шкалы сайта.
+
+   Цветовые роли и их значения взяты из mishka-ds (catppuccin Latte для светлой
+   темы, Macchiato для тёмной) вместе с правками контраста: приглушённые
+   ступени текста там затемнены до AA. Имена ролей те же, поэтому палитры
+   читаются одинаково. Сам пакет не подключается: это копия значений, и цвет
+   сайта сообщества не меняется, когда меняется личный блог.
+
+   Каждая роль записана парой light-dark(светлая, тёмная). Тему выбирает
+   color-scheme: по умолчанию системная, data-theme на <html> закрепляет
+   выбор читателя. Без JS сайт просто следует системной теме.
+
+   Контраст пар «текст / фон» проверяется на сборке: make contrast.
+   Файл разбирает tools/tokens.mjs, из него же цвет попадает в картинки,
+   поэтому значения ролей — только литералы #rrggbb, без var() и вычислений.
+   ============================================================================ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Поверхности */
+  --bg:        light-dark(#eff1f5, #24273a);  /* фон страницы */
+  --bg-elev:   light-dark(#e6e9ef, #1e2030);  /* карточки */
+  --bg-sunken: light-dark(#dce0e8, #181926);  /* метки; ссылки акцентом сюда не ставить */
+
+  /* Текст */
+  --fg:        light-dark(#4c4f69, #cad3f5);
+  --fg-muted:  light-dark(#5c5f77, #a5adcb);
+  --fg-subtle: light-dark(#64677d, #939ab7);
+
+  /* Акцент — Sapphire, и он один: ссылки, кнопки, крупный текст, декор и знак
+     красятся --accent. Ступени 400 и 600 остаются в палитре ради совпадения
+     с mishka-ds, в вёрстке их нет. */
+  --accent:       light-dark(#0b7285, #7dc4e4);
+  --accent-hover: light-dark(#095e6d, #96ccdd);
+  --accent-soft:  light-dark(#bcdff0, #2d4f5c);  /* тихая заливка */
+  --accent-400:   light-dark(#209fb5, #7dc4e4);
+  --accent-600:   light-dark(#1c8a9d, #209fb5);
+
+  /* Текст на заливке акцентом — фон страницы: пара та же, что «акцент / фон». */
+  --on-accent: light-dark(#eff1f5, #24273a);
+
+  /* Границы */
+  --border:        light-dark(#ccd0da, #363a4f);
+  --border-strong: light-dark(#bcc0cc, #494d64);
+
+  /* Код */
+  --code-bg:        light-dark(#e6e9ef, #1e2030);
+  --code-fg:        light-dark(#4c4f69, #cad3f5);
+  --code-inline-bg: light-dark(#dce0e8, #181926);
+
+  /* Состояния: --c-* — декор, --c-*-text — то, чем можно набирать текст. */
+  --c-tip:    light-dark(#40a02b, #a6da95);
+  --c-warn:   light-dark(#fe640b, #f5a97f);
+  --c-danger: light-dark(#d20f39, #ed8796);
+
+  --c-tip-text:    light-dark(#2e7320, #a6da95);
+  --c-warn-text:   light-dark(#9a3f0a, #f5a97f);
+  --c-danger-text: light-dark(#bd0d33, #ed8796);
+
+  --shadow-md: 0 2px 8px light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 35%));
+
+  /* Затемнение страницы под окном поиска. */
+  --scrim: light-dark(rgb(0 0 0 / 35%), rgb(0 0 0 / 60%));
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+/* Системная настройка повышенной контрастности: чёрно-белые поверхности,
+   заметные границы. Значения тоже из mishka-ds. */
+@media (prefers-contrast: more) {
+  :root {
+    --bg:        light-dark(#ffffff, #000000);
+    --bg-elev:   light-dark(#ffffff, #000000);
+    --bg-sunken: light-dark(#f0f0f0, #1a1a1a);
+
+    --fg:        light-dark(#000000, #ffffff);
+    --fg-muted:  light-dark(#1a1a1a, #e6e6e6);
+    --fg-subtle: light-dark(#404040, #bfbfbf);
+
+    --accent:       light-dark(#065666, #a6d8ea);
+    --accent-hover: light-dark(#043b47, #cbe8f3);
+    --accent-400:   light-dark(#0b7285, #7dc4e4);
+    --accent-600:   light-dark(#065666, #209fb5);
+    --on-accent:    light-dark(#ffffff, #000000);
+
+    --border:        light-dark(#999999, #808080);
+    --border-strong: light-dark(#444444, #cccccc);
+
+    --code-bg:        light-dark(#ffffff, #000000);
+    --code-fg:        light-dark(#000000, #ffffff);
+    --code-inline-bg: light-dark(#e8e8e8, #1a1a1a);
+  }
+}
+
+/* ─────────────────────── Шкалы ─────────────────────────────────────────── */
+
+:root {
+  /* Гарнитур две, обе свои (src/styles/fonts.css): текст на всех платформах
+     набран одинаково. Заголовки и словесный знак — тот же гротеск, что и
+     текст; моноширинный — для дат, меток и кода. Системные стеки остаются
+     запасными на время загрузки. */
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Iosevka", ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Начертаний два. Других весов в файлах шрифтов нет. */
+  --fw-regular: 400;
+  --fw-bold:    700;
+
+  --fs-xs:   0.75rem;
+  --fs-sm:   0.875rem;
+  --fs-base: 1rem;
+  --fs-md:   1.125rem;
+  --fs-lg:   1.25rem;
+  --fs-xl:   1.5rem;
+  --fs-2xl:  1.875rem;
+  --fs-3xl:  2.25rem;
+  --fs-4xl:  3rem;
+
+  /* Роли кегля, у которых размер зависит от ширины экрана. Остальные роли
+     берут ступень шкалы напрямую; таблица ролей — в BRAND.md. */
+  --fs-hero:  clamp(var(--fs-2xl), 6vw, var(--fs-4xl));  /* заголовок главной, 30–48 px */
+  --fs-page:  clamp(var(--fs-xl), 5vw, var(--fs-3xl));   /* заголовок страницы, 24–36 px */
+  --fs-block: var(--fs-lg);                              /* заголовок блока: 20 px, от 600 px — 24 */
+  --fs-code:  0.9em;                                     /* код в строке: чуть мельче текста вокруг */
+
+  --lh-none:  1;     /* крупные цифры: число дня, счётчик */
+  --lh-tight: 1.2;
+  --lh-snug:  1.4;
+  --lh-base:  1.65;
+
+  --ls-tight: -0.01em;  /* заголовки и словесный знак */
+  --ls-caps:  0.04em;   /* капсы в надзаголовках и датах */
+
+  --gap-xs:  0.25rem;
+  --gap-sm:  0.5rem;
+  --gap-md:  1rem;
+  --gap-lg:  1.5rem;
+  --gap-xl:  2.5rem;
+  --gap-2xl: 4rem;
+
+  --gap-card: 0.75rem;  /* внутренний отступ карточки и строки списка */
+
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-pill: 999px;
+
+  --content-width:   720px;
+  --container-width: 1120px;
+  --gutter:          1rem;
+
+  /* Наименьшая сторона цели под палец, 44 px. Под мышью кнопки ниже. */
+  --tap-min: 2.75rem;
+
+  --transition: 0.18s ease;
+}
+
+@media (min-width: 600px) {
+  :root { --fs-block: var(--fs-xl); }
+}
+
+@media (min-width: 768px) {
+  :root { --gutter: 1.5rem; }
+}
