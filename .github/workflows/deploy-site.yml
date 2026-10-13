@@ -1,0 +1,162 @@
+name: Deploy site to GitHub Pages
+
+# Триггеры:
+# - push в main, затрагивающий данные, сайт или сам workflow
+# - раз в сутки по расписанию: прошедшие события уезжают в архив при сборке,
+#   и без ночной пересборки календарь начнёт показывать вчерашнее
+# - ручной запуск через UI (workflow_dispatch)
+#
+# GitHub отключает расписание после 60 дней без активности в репозитории.
+# На этот случай страницы сами прячут прошедшее на клиенте (src/scripts/past.ts).
+#
+# Установка и сборка идут через цели Makefile — те же, что локально и в
+# build-check.yml. Деплой не должен собирать сайт иначе, чем проверка.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/**'
+      - 'src/**'
+      - 'public/**'
+      - 'tools/**'
+      - 'astro.config.mjs'
+      - 'tsconfig.json'
+      - 'package.json'
+      - 'bun.lock'
+      - 'Makefile'
+      - '.github/workflows/deploy-site.yml'
+  schedule:
+    # 01:17 UTC — 04:17 по Москве. Не ровный час: на нём очередь GitHub длиннее.
+    - cron: '17 1 * * *'
+  workflow_dispatch:
+
+# Permissions для GitHub Pages OIDC deploy
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Только один деплой за раз; новые отменяют ожидающие, но не in-progress
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Astro site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      # make install при CI=true уходит в bun install --frozen-lockfile
+      - name: Install dependencies
+        run: make install
+
+      # Битая ссылка между записями сборку не роняет — Astro её не видит.
+      # Поэтому данные проверяются и здесь, а не только в PR.
+      - name: Check data
+        run: make data-check
+
+      - name: Build
+        run: make build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5
+
+  # Граф зависимостей GitHub не умеет читать bun.lock: без этого шага в нём
+  # видны только прямые зависимости из package.json, а алерты по транзитивным
+  # CVE не приходят. Отдаём полное дерево через Dependency Submission API.
+  dependency-graph:
+    name: Submit dependency graph
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - run: make dependency-snapshot
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api -X POST \
+            "repos/${GITHUB_REPOSITORY}/dependency-graph/snapshots" \
+            --input dependency-snapshot.json
+
+  # Пингуем IndexNow после деплоя: Яндекс и Bing переобходят быстрее, чем по
+  # расписанию sitemap. Ключ публичный по протоколу — лежит в public/<key>.txt
+  # и отдаётся с https://sre.moscow/<key>.txt. Ночная пересборка содержимое
+  # почти не меняет, поэтому на ней поисковики не дёргаем.
+  indexnow:
+    name: Ping IndexNow
+    needs: deploy
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: jtprogru/indexnow@v0.7.2
+        with:
+          key: 3625005de56818cd5b7a3e2be2d34ae8
+          host: sre.moscow
+          sitemap: https://sre.moscow/sitemap-index.xml
+
+  # Итог пайплайна в Telegram. Отдельным job, а не шагом: job.status внутри
+  # любого из остальных не отражает общий результат. Ночная пересборка
+  # сообщает только о провале — иначе это одно и то же сообщение каждое утро.
+  notify:
+    name: Notify
+    needs: [build, deploy, dependency-graph, indexnow]
+    if: always() && (github.event_name != 'schedule' || contains(needs.*.result, 'failure'))
+    runs-on: ubuntu-latest
+    steps:
+      - id: telegram
+        uses: jtprogru/notiflow@v1.6.1
+        with:
+          bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_USER_ID }}
+          status: >-
+            ${{ contains(needs.*.result, 'failure') && 'failure'
+            || contains(needs.*.result, 'cancelled') && 'cancelled'
+            || 'success' }}
+          message_template: |
+            *Deploy status*: {{.StatusEmoji}}
+            *Project*: `{{.Repo}}`
+            *Runs on*: {{.ServerUrl}}/{{.Repo}}/tree/{{.Sha}}
+            *Branch*: `{{.Ref}}`
+
+      # notiflow по умолчанию не роняет job при отказе доставки, а в лог
+      # на успехе ничего не пишет. Без этого шага неверный chat_id или
+      # отсутствие прав у бота выглядят как зелёный прогон без сообщения.
+      - name: Check delivery
+        if: always()
+        env:
+          OK: ${{ steps.telegram.outputs.ok }}
+          HTTP: ${{ steps.telegram.outputs.http_status }}
+          ERR: ${{ steps.telegram.outputs.error }}
+        run: |
+          if [ "$OK" = "true" ]; then
+            echo "Telegram: доставлено, message_id=${{ steps.telegram.outputs.message_id }}"
+          else
+            echo "::warning title=Telegram::не доставлено (HTTP ${HTTP:-?}): ${ERR:-причина не указана}"
+          fi

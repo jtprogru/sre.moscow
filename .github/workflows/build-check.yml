@@ -1,0 +1,57 @@
+name: Build check
+
+# Проверка PR: та же `make check`, что и локально, без публикации.
+# Ловит ошибки в данных, сломанную сборку и битый календарь до попадания в main.
+#
+# Шаги зовут цели Makefile, а не bun напрямую: упавшую проверку можно
+# воспроизвести у себя одной командой, не читая workflow.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'data/**'
+      - 'templates/**'
+      - 'src/**'
+      - 'public/**'
+      - 'tools/**'
+      # markdownlint ходит по всем .md вне node_modules и dist
+      - '**/*.md'
+      - '.markdownlint-cli2.yaml'
+      - 'astro.config.mjs'
+      - 'tsconfig.json'
+      - 'package.json'
+      - 'bun.lock'
+      - 'Makefile'
+      - '.github/workflows/build-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Новый пуш в PR отменяет предыдущую проверку
+concurrency:
+  group: build-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: make check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Версия bun — из поля packageManager в package.json
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      # make install при CI=true уходит в bun install --frozen-lockfile
+      - name: Install dependencies
+        run: make install
+
+      # Одна цель на всю проверку: markdown, контраст, слова, тесты проверок,
+      # данные, типы, сборка, календарь, правила бренда. Если она упала, сообщение называет файл и поле.
+      - name: Check
+        run: make check
