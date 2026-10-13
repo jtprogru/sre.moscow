@@ -1,0 +1,59 @@
+---
+import { getCollection } from 'astro:content';
+
+import CommunityCard from '../../components/CommunityCard.astro';
+import Filters from '../../components/Filters.astro';
+import Icon from '../../components/Icon.astro';
+import { byText, options } from '../../lib/catalog';
+import { COMMUNITY_KIND, LANG, PLATFORM } from '../../lib/labels';
+import { heading } from '../../lib/site';
+import { topicTitle } from '../../lib/topics';
+import Base from '../../layouts/Base.astro';
+
+// Архивные площадки остаются в каталоге, но уходят в конец: ссылка ещё может
+// пригодиться, а место живых занимать не должна.
+const communities = (await getCollection('communities'))
+  .sort(byText((entry) => entry.data.title))
+  .sort((a, b) => Number(a.data.status === 'archived') - Number(b.data.status === 'archived'));
+
+const filters = [
+  { key: 'topic', label: 'Тема', options: options(communities.flatMap((entry) => entry.data.topics), topicTitle) },
+  { key: 'kind', label: 'Что это', options: options(communities.map((entry) => entry.data.kind), (value) => COMMUNITY_KIND[value as keyof typeof COMMUNITY_KIND]) },
+  { key: 'platform', label: 'Где', options: options(communities.map((entry) => entry.data.platform), (value) => PLATFORM[value as keyof typeof PLATFORM]) },
+  { key: 'lang', label: 'Язык', options: options(communities.map((entry) => entry.data.lang), (value) => LANG[value as keyof typeof LANG]) },
+];
+---
+
+<Base
+  title={heading('/communities/')}
+  description="Чаты, каналы, подкасты и рассылки про SRE, надёжность и observability — куда прийти с вопросом и что читать."
+>
+  <header class="page-head">
+    <h1>{heading('/communities/')}</h1>
+    <p class="page-head__lead">
+      Чаты, каналы, подкасты и рассылки про надёжность и эксплуатацию: куда прийти с вопросом и что читать.
+    </p>
+    <div class="actions">
+      <a class="button button--ghost button--small" href="/contribute/#community">
+        <Icon name="circle-plus" size={16} />
+        Добавить чат или канал
+      </a>
+    </div>
+  </header>
+
+  <Filters filters={filters} view />
+
+  {
+    communities.length === 0 ? (
+      <p class="empty">
+        Здесь пока пусто. <a href="/contribute/#community">Добавь чат или канал</a>, в котором сидишь сам.
+      </p>
+    ) : (
+      <ul class="grid catalog">
+        {communities.map((community) => (
+          <CommunityCard community={community} />
+        ))}
+      </ul>
+    )
+  }
+</Base>
