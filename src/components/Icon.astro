@@ -1,0 +1,28 @@
+---
+import { ICONS, type IconName } from '../lib/icons';
+
+// Иконка из src/lib/icons.ts. Всегда декоративная: смысл несёт подпись рядом
+// или aria-label кнопки, в которой она стоит.
+interface Props {
+  name: IconName;
+  /** Сторона в px: 16 в строке текста, 20 в кнопке, 24 в крупной строке. */
+  size?: 16 | 20 | 24;
+  class?: string;
+}
+
+const { name, size = 20, class: className } = Astro.props;
+---
+
+<svg
+  class:list={['icon', className]}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  set:html={ICONS[name]}
+/>

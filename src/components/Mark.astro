@@ -1,0 +1,27 @@
+---
+import { MARKS, type MarkName } from '../lib/marks';
+
+// Знак площадки из src/lib/marks.ts. Как и иконка, всегда декоративный:
+// площадку называет aria-label ссылки, в которой он стоит.
+interface Props {
+  name: MarkName;
+  /** Сторона в px, шкала та же, что у Icon. */
+  size?: 16 | 20 | 24;
+  class?: string;
+}
+
+const { name, size = 20, class: className } = Astro.props;
+---
+
+<!-- Знак занимает сетку от края до края, а обводка иконок не доходит до края
+     на единицу. Поле в единицу вокруг уравнивает их в одном ряду. -->
+<svg
+  class:list={['icon', className]}
+  width={size}
+  height={size}
+  viewBox="-1 -1 26 26"
+  fill="currentColor"
+  aria-hidden="true"
+>
+  <path d={MARKS[name]}></path>
+</svg>
