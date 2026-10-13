@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+
+import Filters from '../../components/Filters.astro';
+import Icon from '../../components/Icon.astro';
+import TalkCard from '../../components/TalkCard.astro';
+import { options } from '../../lib/catalog';
+import { LANG, LEVEL } from '../../lib/labels';
+import { heading } from '../../lib/site';
+import { topicTitle } from '../../lib/topics';
+import Base from '../../layouts/Base.astro';
+
+const talks = (await getCollection('talks')).sort((a, b) => b.data.date.localeCompare(a.data.date));
+
+const filters = [
+  { key: 'topic', label: 'Тема', options: options(talks.flatMap((talk) => talk.data.topics), topicTitle) },
+  { key: 'level', label: 'Уровень', options: options(talks.map((talk) => talk.data.level), (value) => LEVEL[value as keyof typeof LEVEL]) },
+  { key: 'lang', label: 'Язык', options: options(talks.map((talk) => talk.data.lang), (value) => LANG[value as keyof typeof LANG]) },
+];
+---
+
+<Base
+  title={heading('/talks/')}
+  description="Отобранные доклады и выпуски подкастов про SRE с открытыми записями: у каждого одна фраза о том, зачем его смотреть."
+>
+  <header class="page-head">
+    <h1>{heading('/talks/')}</h1>
+    <p class="page-head__lead">
+      Доклады и выпуски подкастов с открытой записью. Это отбор, а не полный список: у каждого сказано, зачем его
+      смотреть.
+    </p>
+    <div class="actions">
+      <a class="button button--ghost button--small" href="/contribute/#talk">
+        <Icon name="circle-plus" size={16} />
+        Добавить доклад
+      </a>
+    </div>
+  </header>
+
+  <Filters filters={filters} view />
+
+  {
+    talks.length === 0 ? (
+      <p class="empty">
+        Докладов пока нет. <a href="/contribute/#talk">Добавь тот</a>, который советуешь коллегам.
+      </p>
+    ) : (
+      <ul class="grid catalog">
+        {talks.map((talk) => (
+          <TalkCard talk={talk} />
+        ))}
+      </ul>
+    )
+  }
+</Base>
