@@ -1,0 +1,16 @@
+title: "Error Budget: зачем продукту бюджет ошибок?"
+speakers:
+  - name: Александр Глухих
+  - name: Михаил Савин
+    person: mikhail-savin
+  - name: Егор Щапов
+  - name: Кирилл Борисов
+event:
+  name: "В SREду на кухне #7"
+date: 2026-04-29
+lang: ru
+video: https://www.youtube.com/watch?v=pz0QkReLxMY
+topics: [slo, releases]
+level: intro
+why: "Error budget как язык разговора с бизнесом: сколько стоит каждая девятка, чем ошибка отличается от инцидента и когда бюджет бесполезен. Смотри, если SLO у тебя пока украшение дашборда."
+added: 2026-10-09

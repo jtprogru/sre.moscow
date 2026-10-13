@@ -1,0 +1,16 @@
+title: "SLO, инциденты и прод: где заканчивается DevOps и начинается SRE"
+speakers:
+  - name: Михаил Савин
+    person: mikhail-savin
+  - name: Андрей Волхонский
+  - name: Александр Глухих
+  - name: Антон Быстров
+event:
+  name: "В SREду на кухне #1"
+date: 2025-12-10
+lang: ru
+video: https://www.youtube.com/watch?v=OOWxI_dKTWI
+topics: [culture, slo, incidents]
+level: intro
+why: "Пилот: где кончается DevOps и начинается SRE, кто запускает переход и почему внедрение часто превращается в карго-культ. Хорошая точка входа, если в компании SRE пока только слово."
+added: 2026-10-09

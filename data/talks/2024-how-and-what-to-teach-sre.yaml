@@ -1,0 +1,13 @@
+title: Как и чему учить в SRE
+speakers:
+  - name: Руслан Савченко
+event:
+  name: DevOpsConf 2024
+  ref: 2024-03-devopsconf-2024
+date: 2024-03-04
+lang: ru
+video: https://www.youtube.com/watch?v=PTmZeXUKwoU
+topics: [career, culture]
+level: intro
+why: "Программа курса по SRE в ШАД Яндекса: темы, методика и практические задания. Пригодится, если собираешь внутреннее обучение или план развития для инженеров эксплуатации."
+added: 2026-10-09

@@ -1,0 +1,13 @@
+title: "Как внедрять SRE-практики: советы самому себе 6 лет назад"
+speakers:
+  - name: Дмитрий Масленников
+event:
+  name: TeamLead++ Conf 2024
+  ref: 2024-11-teamlead-conf-2024
+date: 2024-11-27
+lang: ru
+video: https://www.youtube.com/watch?v=97UQc1BSxFg
+topics: [culture]
+level: practitioner
+why: "Не про сами SRE-практики, а про то, как внедрять изменения в большой компании, когда от тебя ждут серебряную пулю. Для руководителя, который пришёл строить надёжность с нуля."
+added: 2026-10-09

@@ -1,0 +1,13 @@
+title: Всё стабильно нестабильно — как мы с этим боролись
+speakers:
+  - name: Вячеслав Валявский
+event:
+  name: Magnit OMNI Infrastructure meetup
+  ref: 2025-04-magnit-omni-infrastructure-meetup
+date: 2025-04-23
+lang: ru
+video: https://vkvideo.ru/video-227732568_456239036
+topics: [observability, monitoring, incidents]
+level: practitioner
+why: "Что за год сократило время разбора сбоев в Магнит OMNI: RED-метрики с лейблами хостов, CPU steal, Goldpinger, метрики в спаны через OTel Collector. Конкретика для SRE на Kubernetes."
+added: 2026-10-09

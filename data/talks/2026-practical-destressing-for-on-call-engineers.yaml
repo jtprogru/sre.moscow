@@ -1,0 +1,14 @@
+title: "The Critical Resource Is You: Practical Destressing for On-Call Engineers"
+speakers:
+  - name: Beth Adele Long
+event:
+  name: SREcon26 Americas
+  ref: 2026-03-srecon26-americas
+date: 2026-03-24
+lang: en
+video: https://www.usenix.org/conference/srecon26americas/presentation/long
+slides: https://www.usenix.org/system/files/sre26amer_slides_long.pdf
+topics: [incidents, culture]
+level: intro
+why: "Двадцать минут о том, что on-call делает с телом: хронический стресс дежурств и острый во время инцидента. Полезно, если ведёшь дежурную смену и хочешь замечать перегрузку до выгорания."
+added: 2026-10-09

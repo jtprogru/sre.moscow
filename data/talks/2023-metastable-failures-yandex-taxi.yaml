@@ -1,0 +1,13 @@
+title: Сложность метастабильных состояний отказа на примере Такси
+speakers:
+  - name: Алексей Быков
+event:
+  name: "Yandex Go Infra Meetup #2"
+  ref: 2023-09-yandex-go-infra-meetup-2
+date: 2023-09-02
+lang: ru
+video: https://www.youtube.com/watch?v=HM1Ua_X7O-I
+topics: [resilience, incidents]
+level: advanced
+why: "Как система сама загоняет себя в отказ и не выходит из него: ретрай-шторм, холодный кэш, бимодальная стоимость запроса. Для тех, у кого после сбоя нагрузка не падает, а растёт."
+added: 2026-10-09

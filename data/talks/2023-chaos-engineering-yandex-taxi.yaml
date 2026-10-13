@@ -1,0 +1,14 @@
+title: "Сломай меня полностью: Chaos Engineering"
+speakers:
+  - name: Максим Ивашковский
+  - name: Андрей Матвеев
+event:
+  name: "Yandex Go Infra Meetup #2"
+  ref: 2023-09-yandex-go-infra-meetup-2
+date: 2023-09-02
+lang: ru
+video: https://www.youtube.com/watch?v=ERBRMYGj3KI
+topics: [chaos, resilience]
+level: practitioner
+why: "Хаос на 800 микросервисах Такси: сервисы делят на критичные и некритичные и проверяют это своим инструментом на HTTP-уровне. Смотри, если думаешь, с чего начать chaos engineering."
+added: 2026-10-09

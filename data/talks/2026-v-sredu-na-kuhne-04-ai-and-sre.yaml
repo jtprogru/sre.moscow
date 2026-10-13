@@ -1,0 +1,14 @@
+title: "SRE больше не нужны. AI переписал правила"
+speakers:
+  - name: Михаил Савин
+    person: mikhail-savin
+  - name: Слава Кудряшов
+event:
+  name: "В SREду на кухне #4"
+date: 2026-02-25
+lang: ru
+video: https://www.youtube.com/watch?v=adDzAPLy4Ww
+topics: [automation, incidents, career]
+level: practitioner
+why: "ИИ в эксплуатации на примерах из банковского продакшена: что он уже ускоряет в инцидентах, кто отвечает за ошибки агентов и что будет с джунами. Без хайпа и без паники."
+added: 2026-10-09

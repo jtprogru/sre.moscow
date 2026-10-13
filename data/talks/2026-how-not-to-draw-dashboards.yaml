@@ -1,0 +1,13 @@
+title: Как не нужно рисовать дашборды
+speakers:
+  - name: Владимир Гурьянов
+event:
+  name: Deckhouse Conf 2026
+  ref: 2026-04-deckhouse-conf-2026
+date: 2026-04-09
+lang: ru
+video: https://www.youtube.com/watch?v=SsOXTcE3Iks
+topics: [observability, monitoring]
+level: intro
+why: "Девять правил и пять антипаттернов: дашборд как карта от «сломалось» до «починили», которую строят от пользователя и его задач. Для всех, кто рисует Grafana по наитию."
+added: 2026-10-09

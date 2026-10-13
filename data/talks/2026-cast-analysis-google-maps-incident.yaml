@@ -1,0 +1,14 @@
+title: "The Case of the Misnamed Cities: CAST Analysis of a Google Maps Incident"
+speakers:
+  - name: Ruben Barroso
+event:
+  name: SREcon26 Americas
+  ref: 2026-03-srecon26-americas
+date: 2026-03-25
+lang: en
+video: https://www.usenix.org/conference/srecon26americas/presentation/barroso
+slides: https://www.usenix.org/system/files/sre26amer_slides_barroso.pdf
+topics: [postmortems, incidents]
+level: advanced
+why: "Один и тот же инцидент Google Maps разобран дважды: обычным постмортемом и методом CAST. Смотри, если твои постмортемы упираются в ближайшую причину и чинят только её."
+added: 2026-10-09

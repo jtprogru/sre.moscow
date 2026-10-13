@@ -1,0 +1,13 @@
+title: Инженерия устойчивости как основной инструмент выживания вашей организации
+speakers:
+  - name: Сергей Реусин
+event:
+  name: DevOpsConf 2024
+  ref: 2024-03-devopsconf-2024
+date: 2024-03-04
+lang: ru
+video: https://www.youtube.com/watch?v=E3la7F0n9V8
+topics: [resilience, incidents, culture]
+level: practitioner
+why: "Чем инженерия устойчивости отличается от надёжности и стабильности и как её внедряли в СберМаркете: цели, этапы, успехи и провалы. Для тех, кому мало считать девятки."
+added: 2026-10-09

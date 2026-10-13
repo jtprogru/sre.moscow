@@ -1,0 +1,12 @@
+title: "SLO: как не надо"
+speakers:
+  - name: Сергей Бухаров
+event:
+  name: DevOops 2024
+date: 2024-11-13
+lang: ru
+video: https://www.youtube.com/watch?v=msZXA4waNGQ
+topics: [slo]
+level: practitioner
+why: "Честный забег по граблям: как в Dodo натягивали SLO из книжки на свою реальность и где ошиблись. Смотри до того, как внедрять SLO у себя, чтобы не собрать те же грабли."
+added: 2026-10-09

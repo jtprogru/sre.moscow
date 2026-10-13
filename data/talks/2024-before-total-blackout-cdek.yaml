@@ -1,0 +1,13 @@
+title: Что продуктовой команде нужно сделать ДО полного блэкаута системы
+speakers:
+  - name: Наталья Макарова
+event:
+  name: HighLoad++ 2024
+  ref: 2024-12-highload-2024
+date: 2024-12-03
+lang: ru
+video: https://www.youtube.com/watch?v=IIKtzcA7ht4
+topics: [resilience, incidents]
+level: practitioner
+why: "Блэкаут CDEK глазами техлида продуктовой команды: как поднимать систему с полного нуля, какие скрипты готовить заранее и где все столкнутся при запуске. Для тимлидов и архитекторов."
+added: 2026-10-09

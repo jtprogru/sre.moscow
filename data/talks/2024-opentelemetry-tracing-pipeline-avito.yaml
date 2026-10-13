@@ -1,0 +1,13 @@
+title: Opentelemetry и эволюция распределенного пайплайна трейсинга в Авито
+speakers:
+  - name: Сергей Ларионенко
+event:
+  name: Saint HighLoad++ 2024
+  ref: 2024-06-saint-highload-2024
+date: 2024-06-25
+lang: ru
+video: https://www.youtube.com/watch?v=F8FaB_7gjpc
+topics: [observability, performance]
+level: advanced
+why: "Пайплайн трейсинга на OpenTelemetry под 15 млн спанов в секунду: где упирается производительность и что ломается при tail sampling. Для тех, кто масштабирует трейсинг."
+added: 2026-10-09

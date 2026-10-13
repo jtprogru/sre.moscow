@@ -1,0 +1,16 @@
+title: "Chaos Engineering: Роняем прод, чтобы стать сильнее"
+speakers:
+  - name: Андрей Волхонский
+  - name: Михаил Савин
+    person: mikhail-savin
+  - name: Илья Садыков
+  - name: Дмитрий Баскаков
+event:
+  name: "В SREду на кухне #6"
+date: 2026-04-08
+lang: ru
+video: https://www.youtube.com/watch?v=UeZtZMeonnY
+topics: [chaos, resilience, culture]
+level: practitioner
+why: "С чего начинать хаос-эксперименты и кто должен их запускать, при чём тут blameless-культура и error budget, нужен ли хаос маленькой компании. Для тех, кто хочет ломать прод осознанно."
+added: 2026-10-09

@@ -1,0 +1,12 @@
+title: Автоматизация инцидент-менеджмента для 10000 инженеров в Т-Банке
+speakers:
+  - name: Иван Юрченко
+event:
+  name: HighLoad++ 2024
+date: 2024-12-02
+lang: ru
+video: https://www.youtube.com/watch?v=V-1gf-s0bSs
+topics: [incidents, automation, monitoring]
+level: practitioner
+why: "Как Т-Банк построил свою платформу инцидент-менеджмента на 10 000 инженеров: эскалации, постанализ, снижение MTTR. Смотри, если инцидент-процесс у тебя пока живёт в чате и таблице."
+added: 2026-10-09

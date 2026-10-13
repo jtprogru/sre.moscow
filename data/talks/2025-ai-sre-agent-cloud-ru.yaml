@@ -1,0 +1,13 @@
+title: "AI SRE: AI Agent как напарник инженера"
+speakers:
+  - name: Сергей Шапошников
+event:
+  name: Big Tech Night 2025
+  ref: 2025-09-big-tech-night-2025
+date: 2025-09-12
+lang: ru
+video: https://www.youtube.com/watch?v=1UQ4SnsTn8c
+topics: [automation, monitoring, incidents]
+level: practitioner
+why: "Мультиагентная система Cloud.ru как второй пилот SRE: настраивает сбор метрик и логов, заводит алерты, подсказывает следующий шаг при инциденте. Смотри, если думаешь, куда пустить ИИ."
+added: 2026-10-09

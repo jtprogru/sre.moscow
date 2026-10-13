@@ -1,0 +1,12 @@
+title: Боремся с метастабильными состояниями отказа
+speakers:
+  - name: Вадим Мартынов
+event:
+  name: DevOops 2024
+date: 2024-11-13
+lang: ru
+video: https://www.youtube.com/watch?v=C6CGk6ZQdmM
+topics: [resilience, performance]
+level: advanced
+why: "У рейт-лимитеров, троттлинга и деградаций есть слабые места, и доклад предлагает ещё одну защиту без ручной настройки. Для тех, кто уже ловил перегрузку, из которой сервис сам не выходит."
+added: 2026-10-09

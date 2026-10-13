@@ -1,0 +1,13 @@
+title: "Avito Static Fallback: без паники, в продакшене работает статика"
+speakers:
+  - name: Николай Губин
+event:
+  name: Magnit OMNI Infrastructure meetup
+  ref: 2025-04-magnit-omni-infrastructure-meetup
+date: 2025-04-23
+lang: ru
+video: https://vkvideo.ru/video-227732568_456239037
+topics: [resilience, incidents]
+level: practitioner
+why: "Как Авито остаётся доступным, когда прод лежит: кэш статики без инфраструктурных зависимостей, на который переключают трафик при инциденте. Для тех, кто проектирует деградацию."
+added: 2026-10-09

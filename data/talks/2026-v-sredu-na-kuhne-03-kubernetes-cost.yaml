@@ -1,0 +1,16 @@
+title: "Почему Kubernetes не бесплатный? Что лучше: опенсорс, облако, вендор"
+speakers:
+  - name: Михаил Савин
+    person: mikhail-savin
+  - name: Андрей Волхонский
+  - name: Александр Глухих
+  - name: Юрий Лосев
+event:
+  name: "В SREду на кухне #3"
+date: 2026-02-04
+lang: ru
+video: https://www.youtube.com/watch?v=76_IJFOIFLA
+topics: [kubernetes, cost, platform]
+level: practitioner
+why: "Сколько на самом деле стоит «бесплатный» Kubernetes: команда, обновления, ошибки. Поможет выбрать между опенсорсом, вендорской платформой и облаком под размер своей компании."
+added: 2026-10-09

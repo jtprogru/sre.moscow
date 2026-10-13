@@ -1,0 +1,15 @@
+title: Executing Chaos Engineering in Production at a Critical Financial Institution
+speakers:
+  - name: Luiz Siqueira
+  - name: Leonardo Marques
+event:
+  name: SREcon26 Americas
+  ref: 2026-03-srecon26-americas
+date: 2026-03-24
+lang: en
+video: https://www.usenix.org/conference/srecon26americas/presentation/siqueira
+slides: https://www.usenix.org/system/files/sre26amer_slides_marques.pdf
+topics: [chaos, resilience]
+level: practitioner
+why: "Как запускать хаос-эксперименты в проде банка, где «просто уронить» никто не даст: guardrails, автоматизация, GameDays. С цифрами авторов: MTTD упал на 73%, нашли 10 скрытых уязвимостей."
+added: 2026-10-09

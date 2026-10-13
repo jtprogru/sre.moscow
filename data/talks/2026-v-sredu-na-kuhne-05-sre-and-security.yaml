@@ -1,0 +1,16 @@
+title: "Внутренняя кухня SRE и информационной безопасности"
+speakers:
+  - name: Михаил Савин
+    person: mikhail-savin
+  - name: Александр Глухих
+  - name: Александр Трифанов
+  - name: Владимир Кочетков
+event:
+  name: "В SREду на кухне #5"
+date: 2026-03-18
+lang: ru
+video: https://www.youtube.com/watch?v=w2O5jzAO8BU
+topics: [incidents, culture]
+level: practitioner
+why: "Где SRE и безопасники мешают друг другу, а где работают вместе: сканеры в CI/CD, патчи против стабильности, ничейные зоны ответственности. Смотри, если ИБ для тебя пока только источник блокеров."
+added: 2026-10-09

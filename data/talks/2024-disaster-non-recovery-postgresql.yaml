@@ -1,0 +1,13 @@
+title: Дизастер нерекавери, или Как на очередных учениях по отказоустойчивости у нас сломались PostgreSQL-кластеры
+speakers:
+  - name: Артем Федоров
+event:
+  name: HighLoad++ 2024
+  ref: 2024-12-highload-2024
+date: 2024-12-02
+lang: ru
+video: https://www.youtube.com/watch?v=R5T-OXmmup8
+topics: [databases, resilience, incidents]
+level: advanced
+why: "Разбор учений с отключением дата-центра, после которых в Patroni-кластерах в строй вернулись мастера на старых таймлайнах. Для тех, кто доверяет автофейловеру PostgreSQL."
+added: 2026-10-09

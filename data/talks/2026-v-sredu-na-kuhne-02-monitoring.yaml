@@ -1,0 +1,15 @@
+title: "Почему ваш мониторинг врет? SRE об алертах и наблюдаемости"
+speakers:
+  - name: Михаил Савин
+    person: mikhail-savin
+  - name: Андрей Волхонский
+  - name: Евгений Харченко
+event:
+  name: "В SREду на кухне #2"
+date: 2026-01-14
+lang: ru
+video: https://www.youtube.com/watch?v=WyT9ni4mGtU
+topics: [monitoring, observability]
+level: practitioner
+why: "Мониторинг глазами пользователя, а не сервера: с каких метрик начинать, почему «всё зелёное» ничего не значит и что делать с шумом алертов, пока дежурные не выгорели."
+added: 2026-10-09

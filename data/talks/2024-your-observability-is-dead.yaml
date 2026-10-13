@@ -1,0 +1,13 @@
+title: Твой observability мёртв, мой тоже
+speakers:
+  - name: Владимир Дроздецкий
+event:
+  name: "Kuber Conf'24"
+  ref: 2024-07-kuber-conf-24
+date: 2024-07-04
+lang: ru
+video: https://www.youtube.com/watch?v=GgP3s1uo0qM&t=6552s
+topics: [observability, monitoring, incidents]
+level: practitioner
+why: "Проход по observability в Магните: именование метрик, уровни алертов и эскалации, формат логов, трейсинг, воркбуки на инцидент. Удобный чек-лист, чтобы сверить свой стек."
+added: 2026-10-09

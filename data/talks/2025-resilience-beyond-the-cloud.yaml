@@ -1,0 +1,13 @@
+title: Отказоустойчивость кроме облака
+speakers:
+  - name: Андрей Сухоруков
+event:
+  name: Magnit OMNI Infrastructure meetup
+  ref: 2025-04-magnit-omni-infrastructure-meetup
+date: 2025-04-23
+lang: ru
+video: https://vkvideo.ru/video-227732568_456239038
+topics: [resilience, automation]
+level: practitioner
+why: "Как строить отказоустойчивость, не полагаясь на облако, и почему переносимая автоматизация инфраструктуры выгоднее огромных кластеров. Для тех, кто живёт у одного провайдера."
+added: 2026-10-09

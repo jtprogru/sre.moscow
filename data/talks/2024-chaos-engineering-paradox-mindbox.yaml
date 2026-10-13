@@ -1,0 +1,13 @@
+title: "Сломать, чтобы починить: парадокс хаос-инжиниринга в действии"
+speakers:
+  - name: Дмитрий Баскаков
+event:
+  name: Yandex Scale 2024
+  ref: 2024-09-yandex-scale-2024
+date: 2024-09-25
+lang: ru
+video: https://www.youtube.com/watch?v=zTlUu0mbpVw
+topics: [chaos, kubernetes]
+level: practitioner
+why: "Опыт Mindbox с Chaos Mesh: эксперименты лежат рядом с кодом сервисов и идут на проде в середине нагрузки. Смотри, если выбираешь между Chaos Mesh и Litmus и боишься трогать прод."
+added: 2026-10-09
