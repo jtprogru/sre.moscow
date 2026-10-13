@@ -1,0 +1,14 @@
+sre.moscow
+Copyright 2026 Mikhail Savin and sre.moscow contributors
+
+Код сайта распространяется под лицензией Apache-2.0 (LICENSE), данные каталога в data/ — под CC BY 4.0 (LICENSE-DATA).
+
+Бренд под эти лицензии не попадает: название, знак, словесный знак, сова и собранные из них картинки, в репозитории — каталог src/brand/, tools/og.html и public/og.png. Условия на него — в LICENSE-BRAND.
+
+Значения цветовых ролей в src/styles/tokens.css взяты из дизайн-системы mishka-ds того же автора. В mishka-ds они выпущены под PolyForm Noncommercial; в этом репозитории автор передаёт этот фрагмент под лицензией проекта, Apache-2.0. На остальную часть mishka-ds и на бренд «Мишка на сервере» это не распространяется.
+
+Шрифты в src/fonts/ — IBM Plex Sans (Copyright 2019 IBM Corp.) и Iosevka (Copyright (c) 2015-2023 Renzhi Li). Оба распространяются под SIL Open Font License 1.1, под лицензию проекта не переходят. Файлы — сабсеты, собранные в mishka-ds; тексты лицензий лежат рядом: src/fonts/LICENSE-ibm-plex-sans.txt и src/fonts/LICENSE-iosevka.txt.
+
+Контуры иконок в src/lib/icons.ts взяты без изменений из Lucide 1.55.0 (Copyright (c) 2026 Lucide Icons and Contributors), лицензия ISC; часть контуров унаследована от Feather (Copyright (c) 2013-present Cole Bemis), лицензия MIT. Текст обеих лицензий — в src/lib/LICENSE-lucide.txt.
+
+Знаки площадок в src/lib/marks.ts взяты без изменений из Simple Icons 16.35.0, лицензия CC0 1.0. Сами знаки остаются товарными знаками своих владельцев и под лицензию проекта не переходят.
