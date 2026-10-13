@@ -1,5 +1,15 @@
 # sre.moscow
 
+<!-- markdownlint-disable MD033 -->
+<a href="https://sre.moscow/">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/cover-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset=".github/cover-light.png">
+    <img src=".github/cover-light.png" alt="sre.moscow — каталог SRE-сообщества. Где говорят про надёжность">
+  </picture>
+</a>
+<!-- markdownlint-enable MD033 -->
+
 [sre.moscow](https://sre.moscow/) — каталог SRE-сообщества: что смотреть, где общаются, к кому идти с вопросом и куда приехать.
 
 Для тех, кто занимается надёжностью и эксплуатацией, от студентов последних курсов до лидов. Охват — русскоязычное сообщество плюс международные площадки, где надёжность основная тема.
