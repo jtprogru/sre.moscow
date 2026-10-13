@@ -13,7 +13,7 @@ PORT ?= 4321
 BUN_INSTALL_FLAGS := $(if $(CI),--frozen-lockfile,)
 
 .DEFAULT_GOAL := help
-.PHONY: help install dev build preview typecheck lint test data-check contrast copy-check copy-check-dist brand-check ics-check check ui-check dependency-snapshot clean
+.PHONY: help install dev build preview typecheck lint test data-check contrast copy-check copy-check-dist brand-check ics-check check ui-check cover dependency-snapshot clean
 
 # Порядок целей в check значим: дешёвое раньше дорогого, сборка раньше того,
 # что читает dist/.
@@ -82,6 +82,13 @@ check: lint contrast copy-check test data-check typecheck build ics-check copy-c
 # bunx playwright install; каких нет — пропускаются, в CI это ошибка.
 ui-check: build ## Проверить вёрстку в браузерах, скриншоты — в ui-check/
 	node tools/ui-check.mjs
+
+# Обложка репозитория: шапка README.md и Social preview на GitHub. PNG лежат
+# в .github/ и пересобираются руками, когда меняется знак, сова, палитра или
+# слова. В make check не входит: снимок делает Chromium из Playwright. Размер
+# и цвет готовых картинок сторожит make test.
+cover: node_modules ## Пересобрать обложку репозитория в .github/
+	bun tools/cover.mjs
 
 dependency-snapshot: node_modules ## Собрать снапшот дерева зависимостей для GitHub
 	bun tools/bun-dependency-snapshot.mjs > dependency-snapshot.json

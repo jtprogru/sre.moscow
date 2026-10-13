@@ -3,7 +3,7 @@ Copyright 2026 Mikhail Savin and sre.moscow contributors
 
 Код сайта распространяется под лицензией Apache-2.0 (LICENSE), данные каталога в data/ — под CC BY 4.0 (LICENSE-DATA).
 
-Бренд под эти лицензии не попадает: название, знак, словесный знак, сова и собранные из них картинки, в репозитории — каталог src/brand/, tools/og.html и public/og.png. Условия на него — в LICENSE-BRAND.
+Бренд под эти лицензии не попадает: название, знак, словесный знак, сова и собранные из них картинки, в репозитории — каталог src/brand/, tools/og.html, public/og.png и обложки .github/cover-light.png и .github/cover-dark.png. Условия на него — в LICENSE-BRAND.
 
 Значения цветовых ролей в src/styles/tokens.css взяты из дизайн-системы mishka-ds того же автора. В mishka-ds они выпущены под PolyForm Noncommercial; в этом репозитории автор передаёт этот фрагмент под лицензией проекта, Apache-2.0. На остальную часть mishka-ds и на бренд «Мишка на сервере» это не распространяется.
 
