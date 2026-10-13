@@ -1,0 +1,69 @@
+name: Свой профиль
+description: Добавить себя в раздел «Люди»
+title: "Профиль: "
+labels: [new-record]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Эта форма — только для своего профиля. Профиль другого человека появляется лишь с его явного согласия, правило описано в [CRITERIA.md](https://github.com/jtprogru/sre.moscow/blob/main/CRITERIA.md#люди). По форме куратор соберёт `data/people/<slug>.yaml`; убрать профиль можно в любой момент и без объяснений.
+
+  - type: input
+    id: name
+    attributes:
+      label: Имя
+      description: Так, как ты хочешь быть подписан
+    validations:
+      required: true
+
+  - type: input
+    id: photo
+    attributes:
+      label: Фото
+      description: По желанию. Ссылка на картинку, которой управляешь ты сам, например аватар GitHub. Сайт скачает её при сборке и покажет уменьшенную копию, без ссылки в профиле будут инициалы
+      placeholder: https://github.com/example.png
+
+  - type: textarea
+    id: bio
+    attributes:
+      label: Чем занимаешься
+      description: До 300 символов. Конкретно — что эксплуатируешь и чем можешь помочь
+    validations:
+      required: true
+
+  - type: input
+    id: topics
+    attributes:
+      label: Темы
+      description: По каким к тебе стоит идти. Через запятую, id из [data/topics.yaml](https://github.com/jtprogru/sre.moscow/blob/main/data/topics.yaml)
+      placeholder: incidents, postmortems
+    validations:
+      required: true
+
+  - type: textarea
+    id: links
+    attributes:
+      label: Контакты
+      description: Только те, по которым готов отвечать. По одному на строку. Подходят telegram, github, linkedin, mastodon, youtube, site
+      placeholder: |
+        telegram https://t.me/example
+        github https://github.com/example
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: open_to
+    attributes:
+      label: Зачем к тебе можно обращаться
+      options:
+        - label: questions — можно спросить
+        - label: mentoring — менторю
+        - label: speaking — выступаю
+
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Согласие
+      options:
+        - label: Это мой профиль, и я согласен на его публикацию на sre.moscow
+          required: true

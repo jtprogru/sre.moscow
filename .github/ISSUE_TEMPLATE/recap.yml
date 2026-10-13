@@ -1,0 +1,52 @@
+name: Разбор события
+description: Приложить к прошедшему событию текст участника о том, что там было
+title: "Разбор: "
+labels: [new-record]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Разбор живёт в файле события: по форме куратор допишет блок `recaps` в `data/events/<гггг-мм>-<slug>.yaml`. Что считается разбором — в [CRITERIA.md](https://github.com/jtprogru/sre.moscow/blob/main/CRITERIA.md#разборы). Профиль автора для этого не нужен и по этой форме не создаётся. Если умеешь в PR, быстрее сразу прислать правку файла события, пример блока есть в [шаблоне](https://github.com/jtprogru/sre.moscow/blob/main/templates/event.yaml).
+
+  - type: input
+    id: event
+    attributes:
+      label: Событие
+      description: Адрес его строки в архиве или название с годом. Если события в каталоге ещё нет, сначала предложи его отдельной формой
+      placeholder: https://sre.moscow/events/archive/#2025-04-devopsconf-2025
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Ссылка на разбор
+      placeholder: https://example.org/blog/sre-meetup-recap
+    validations:
+      required: true
+
+  - type: input
+    id: title
+    attributes:
+      label: Заголовок
+      description: Так, как он написан на странице текста
+    validations:
+      required: true
+
+  - type: input
+    id: author
+    attributes:
+      label: Автор
+      description: Подпись со страницы текста — имя, ник или название блога
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Проверки
+      options:
+        - label: Открыл ссылку — текст на месте и читается без оплаты и регистрации
+          required: true
+        - label: Это текст участника о содержании события, а не анонс или пресс-релиз организатора
+          required: true

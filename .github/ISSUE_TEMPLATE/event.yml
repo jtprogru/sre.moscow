@@ -1,0 +1,120 @@
+name: Событие
+description: Предложить конференцию или митап в календарь
+title: "Событие: "
+labels: [new-record]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Форма задаёт те же вопросы, что и файл записи: по ней куратор соберёт `data/events/<гггг-мм>-<slug>.yaml`. Что подходит календарю — в [CRITERIA.md](https://github.com/jtprogru/sre.moscow/blob/main/CRITERIA.md#события). Если умеешь в PR, быстрее сразу прислать файл по [шаблону](https://github.com/jtprogru/sre.moscow/blob/main/templates/event.yaml).
+
+  - type: input
+    id: title
+    attributes:
+      label: Название
+      description: Так, как оно написано на странице события
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Страница события
+      description: Именно этого события, а не главная организатора
+      placeholder: https://example.org/events/sre-meetup
+    validations:
+      required: true
+
+  - type: input
+    id: start
+    attributes:
+      label: Начало
+      description: Дата, а если известно — и местное время с городом или часовым поясом
+      placeholder: 2026-11-05 19:00, Москва
+    validations:
+      required: true
+
+  - type: input
+    id: end
+    attributes:
+      label: Конец
+      description: Если событие идёт несколько дней или известно время окончания
+      placeholder: 2026-11-06
+
+  - type: dropdown
+    id: format
+    attributes:
+      label: Формат
+      options:
+        - offline — очно
+        - online — онлайн
+        - hybrid — очно и онлайн
+    validations:
+      required: true
+
+  - type: input
+    id: city
+    attributes:
+      label: Город и страна
+      description: Для очных и гибридных событий
+      placeholder: Москва, Россия
+
+  - type: dropdown
+    id: lang
+    attributes:
+      label: Язык докладов
+      options:
+        - ru
+        - en
+    validations:
+      required: true
+
+  - type: input
+    id: organizer
+    attributes:
+      label: Организатор
+      description: Так, как он назван на странице события
+    validations:
+      required: true
+
+  - type: dropdown
+    id: price
+    attributes:
+      label: Участие
+      options:
+        - free — бесплатно
+        - paid — платно
+    validations:
+      required: true
+
+  - type: input
+    id: cfp
+    attributes:
+      label: Приём заявок на доклады
+      description: Ссылка и дедлайн, если CFP открыт
+      placeholder: https://example.org/cfp, до 2026-10-01
+
+  - type: input
+    id: topics
+    attributes:
+      label: Темы
+      description: Через запятую, id из [data/topics.yaml](https://github.com/jtprogru/sre.moscow/blob/main/data/topics.yaml)
+      placeholder: incidents, observability
+    validations:
+      required: true
+
+  - type: input
+    id: series
+    attributes:
+      label: Серия
+      description: Если это очередной выпуск регулярного митапа или конференции
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Проверки
+      options:
+        - label: Открыл страницу события — дата и название совпадают с тем, что я написал
+          required: true
+        - label: Событие публичное, надёжность или эксплуатация — его основная тема
+          required: true

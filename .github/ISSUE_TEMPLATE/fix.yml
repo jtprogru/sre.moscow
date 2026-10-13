@@ -1,0 +1,37 @@
+name: Исправить или удалить
+description: Ссылка умерла, данные устарели или запись нужно убрать
+title: "Правка: "
+labels: [fix]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Одна запись — один issue. Если правка в пару строк, быстрее сразу прислать PR с изменением файла в `data/`. Просьбу убрать запись о себе выполняем без вопросов; если не хочешь писать о ней публично, скажи любому куратору в чате.
+
+  - type: input
+    id: record
+    attributes:
+      label: Запись
+      description: Адрес страницы на сайте или путь к файлу в data/
+      placeholder: https://sre.moscow/organizers/example/
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Что нужно сделать
+      options:
+        - Ссылка не открывается или ведёт не туда
+        - Данные устарели — дата, название, статус
+        - Запись не подходит под критерии каталога
+        - Убрать запись обо мне
+        - Другое
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Подробности
+      description: Что написано сейчас и как должно быть. Для просьбы об удалении можно оставить пустым

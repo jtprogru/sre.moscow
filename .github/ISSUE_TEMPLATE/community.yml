@@ -1,0 +1,93 @@
+name: Чат, канал, подкаст
+description: Предложить площадку про SRE, надёжность или observability
+title: "Сообщество: "
+labels: [new-record]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Форма задаёт те же вопросы, что и файл записи: по ней куратор соберёт `data/communities/<slug>.yaml`. Что подходит разделу — в [CRITERIA.md](https://github.com/jtprogru/sre.moscow/blob/main/CRITERIA.md#сообщества). Если умеешь в PR, быстрее сразу прислать файл по [шаблону](https://github.com/jtprogru/sre.moscow/blob/main/templates/community.yaml).
+
+  - type: input
+    id: title
+    attributes:
+      label: Название
+      description: Так, как оно написано на самой площадке
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Что это
+      options:
+        - chat — чат
+        - channel — канал
+        - forum — форум
+        - podcast — подкаст
+        - newsletter — рассылка
+        - meetup — митап-группа
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Где живёт
+      options:
+        - telegram
+        - slack
+        - discord
+        - youtube
+        - vk
+        - matrix
+        - email
+        - web
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Ссылка
+      description: Публичная. Для Telegram — вида https://t.me/имя, пригласительные ссылки протухают
+      placeholder: https://t.me/example
+    validations:
+      required: true
+
+  - type: dropdown
+    id: lang
+    attributes:
+      label: Язык
+      options:
+        - ru
+        - en
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: О чём площадка
+      description: До 200 символов — что там обсуждают и с каким вопросом туда идти
+    validations:
+      required: true
+
+  - type: input
+    id: topics
+    attributes:
+      label: Темы
+      description: Через запятую, id из [data/topics.yaml](https://github.com/jtprogru/sre.moscow/blob/main/data/topics.yaml)
+      placeholder: incidents, observability
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Проверки
+      options:
+        - label: Открыл ссылку — площадка существует и доступна всем
+          required: true
+        - label: Это не канал вакансий, не реклама курса и не общий DevOps-чат
+          required: true

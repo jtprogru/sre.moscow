@@ -1,0 +1,29 @@
+version: 2
+
+# Для bun Dependabot security updates пока не поддерживаются — только version
+# updates и только по конфигу, поэтому он здесь.
+# https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories
+updates:
+  - package-ecosystem: "bun"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "build(deps)"
+    open-pull-requests-limit: 5
+    ignore:
+      # typescript держится на 6.x, пока `astro check` не умеет работать с 7.
+      # Нативный компилятор TypeScript 7 не отдаёт программный API, на котором
+      # построен @astrojs/language-server, и цель typecheck падает целиком.
+      # Апстрим ведёт поддержку в
+      # https://github.com/withastro/roadmap/discussions/1321 — как появится,
+      # снять эти две строки.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "ci(deps)"

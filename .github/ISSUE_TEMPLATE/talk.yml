@@ -1,0 +1,102 @@
+name: Доклад
+description: Предложить доклад с открытой записью
+title: "Доклад: "
+labels: [new-record]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Форма задаёт те же вопросы, что и файл записи: по ней куратор соберёт `data/talks/<год>-<slug>.yaml`. Что подходит разделу — в [CRITERIA.md](https://github.com/jtprogru/sre.moscow/blob/main/CRITERIA.md#доклады). Профиль спикера для доклада не нужен и по этой форме не создаётся. Если умеешь в PR, быстрее сразу прислать файл по [шаблону](https://github.com/jtprogru/sre.moscow/blob/main/templates/talk.yaml).
+
+  - type: input
+    id: title
+    attributes:
+      label: Название доклада
+    validations:
+      required: true
+
+  - type: input
+    id: speakers
+    attributes:
+      label: Спикеры
+      description: Имена так, как они указаны на странице доклада, через запятую
+    validations:
+      required: true
+
+  - type: input
+    id: event
+    attributes:
+      label: Где прозвучал
+      description: Название конференции или митапа. Для выпуска подкаста — название подкаста и номер выпуска
+    validations:
+      required: true
+
+  - type: input
+    id: date
+    attributes:
+      label: Дата доклада
+      placeholder: 2025-05-20
+    validations:
+      required: true
+
+  - type: dropdown
+    id: lang
+    attributes:
+      label: Язык
+      options:
+        - ru
+        - en
+    validations:
+      required: true
+
+  - type: input
+    id: video
+    attributes:
+      label: Запись
+      description: Страница с видео, доступная без оплаты и регистрации
+      placeholder: https://www.youtube.com/watch?v=...
+    validations:
+      required: true
+
+  - type: input
+    id: slides
+    attributes:
+      label: Слайды
+      description: Если выложены
+
+  - type: input
+    id: topics
+    attributes:
+      label: Темы
+      description: Через запятую, id из [data/topics.yaml](https://github.com/jtprogru/sre.moscow/blob/main/data/topics.yaml)
+      placeholder: slo, monitoring
+    validations:
+      required: true
+
+  - type: dropdown
+    id: level
+    attributes:
+      label: Кому
+      options:
+        - intro — начинающим
+        - practitioner — практикам
+        - advanced — опытным
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Зачем это смотреть
+      description: Одна фраза до 200 символов, своими словами. Не аннотация, а ответ коллеге на вопрос «а что там полезного?»
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Проверки
+      options:
+        - label: Открыл запись — это тот самый доклад, и он доступен всем
+          required: true
+        - label: Смотрел доклад сам

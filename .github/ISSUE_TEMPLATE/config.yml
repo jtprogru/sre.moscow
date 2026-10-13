@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Что подходит каталогу
+    url: https://github.com/jtprogru/sre.moscow/blob/main/CRITERIA.md
+    about: Критерии отбора по разделам и правило согласия для профилей — стоит прочитать до заявки
+  - name: Чат сообщества
+    url: https://t.me/jtprogru_chat
+    about: Можно без формы — кинь ссылку и напиши, что это и зачем оно сообществу, запись оформят кураторы

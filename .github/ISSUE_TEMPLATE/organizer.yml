@@ -1,0 +1,102 @@
+name: Компания или организатор
+description: Предложить того, кто проводит события про надёжность и эксплуатацию
+title: "Организатор: "
+labels: [new-record]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Форма задаёт те же вопросы, что и файл записи: по ней куратор соберёт `data/organizers/<slug>.yaml`. Что подходит разделу — в [CRITERIA.md](https://github.com/jtprogru/sre.moscow/blob/main/CRITERIA.md#компании-и-организаторы). Размещение бесплатное и не продаётся, порядок на сайте алфавитный. Если умеешь в PR, быстрее сразу прислать файл по [шаблону](https://github.com/jtprogru/sre.moscow/blob/main/templates/organizer.yaml).
+
+  - type: input
+    id: name
+    attributes:
+      label: Название
+      description: Так, как организатор называет себя сам
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Кто это
+      options:
+        - company — компания
+        - conference-organizer — организатор конференций
+        - community — сообщество
+    validations:
+      required: true
+
+  - type: textarea
+    id: links
+    attributes:
+      label: Ссылки
+      description: |
+        По одной на строку: вид и адрес. Виды: `events` — страница с расписанием или анонсами (обязательна), `recordings` — записи докладов, `announcements` — канал или рассылка с анонсами, `cfp` — приём заявок.
+      placeholder: |
+        events https://example.org/events
+        recordings https://www.youtube.com/@example
+    validations:
+      required: true
+
+  - type: textarea
+    id: series
+    attributes:
+      label: Серии событий
+      description: Названия митапов и конференций, по которым его события узнают, и как часто они проходят
+      placeholder: Example SRE Meetup — раз в квартал
+
+  - type: dropdown
+    id: formats
+    attributes:
+      label: Форматы
+      multiple: true
+      options:
+        - offline
+        - online
+        - hybrid
+    validations:
+      required: true
+
+  - type: input
+    id: cities
+    attributes:
+      label: Города
+      description: Где проходят очные события, через запятую
+
+  - type: dropdown
+    id: lang
+    attributes:
+      label: Язык событий
+      options:
+        - ru
+        - en
+    validations:
+      required: true
+
+  - type: input
+    id: topics
+    attributes:
+      label: Темы
+      description: Через запятую, id из [data/topics.yaml](https://github.com/jtprogru/sre.moscow/blob/main/data/topics.yaml)
+      placeholder: incidents, observability
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Зачем за ним следить
+      description: Одна фраза до 200 символов
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Проверки
+      options:
+        - label: Открыл каждую ссылку — на странице событий видно расписание или анонсы
+          required: true
+        - label: События публичные и технические, это не HR-дни и не продуктовые презентации
+          required: true
