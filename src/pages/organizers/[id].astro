@@ -1,0 +1,165 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+import EventItem from '../../components/EventItem.astro';
+import ExternalLink from '../../components/ExternalLink.astro';
+import Icon from '../../components/Icon.astro';
+import TalkCard from '../../components/TalkCard.astro';
+import TopicTags from '../../components/TopicTags.astro';
+import { getEvents } from '../../lib/catalog';
+import { formatDay } from '../../lib/dates';
+import type { IconName } from '../../lib/icons';
+import { FORMAT, LANG, LINK_KIND, ORGANIZER_KIND, STATUS } from '../../lib/labels';
+import { REPO } from '../../lib/site';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const organizers = await getCollection('organizers');
+  return organizers.map((organizer) => ({ params: { id: organizer.id }, props: { organizer } }));
+}
+
+interface Props {
+  organizer: CollectionEntry<'organizers'>;
+}
+
+const { organizer } = Astro.props;
+const { data } = organizer;
+
+// Карточка сама собирает то, что о ней знают другие разделы: событие
+// ссылается на организатора, доклад — на событие.
+const { all, upcoming } = await getEvents();
+const ownEvents = new Set(all.filter((event) => event.data.organizer.ref?.id === organizer.id).map((event) => event.id));
+const events = upcoming.filter((event) => ownEvents.has(event.id));
+const talks = (await getCollection('talks'))
+  .filter((talk) => talk.data.event.ref && ownEvents.has(talk.data.event.ref.id))
+  .sort((a, b) => b.data.date.localeCompare(a.data.date));
+
+const eventsLink = data.links.find((link) => link.kind === 'events');
+
+// Кнопка без иконки на сайте не стоит: у каждого вида ссылки она своя.
+const LINK_ICON = {
+  events: 'calendar',
+  recordings: 'circle-play',
+  announcements: 'megaphone',
+  cfp: 'send',
+} satisfies Record<keyof typeof LINK_KIND, IconName>;
+---
+
+<Base title={data.name} description={data.why}>
+  <a class="back" href="/organizers/">
+    <Icon name="arrow-left" size={16} />
+    Все организаторы
+  </a>
+  <article class="profile">
+    <header class="page-head">
+      <p class="meta">
+        <span class="eyebrow">{ORGANIZER_KIND[data.kind]}</span>
+        {data.status !== 'active' && <span class="badge badge--warn">{STATUS[data.status]}</span>}
+      </p>
+      <h1>{data.name}</h1>
+      <p class="page-head__lead">{data.why}</p>
+      <p class="meta">
+        <span>{data.formats.map((value) => FORMAT[value]).join(', ')}</span>
+        {data.cities.length > 0 && <span>{data.cities.join(', ')}</span>}
+        <span>{LANG[data.lang]}</span>
+      </p>
+      <div class="actions">
+        {
+          data.links.map((link) => (
+            <ExternalLink
+              class:list={['button', 'button--small', { 'button--ghost': link.kind !== 'events' }]}
+              href={link.url}
+            >
+              <Icon name={LINK_ICON[link.kind]} size={16} />
+              {link.label ?? LINK_KIND[link.kind]}
+            </ExternalLink>
+          ))
+        }
+      </div>
+      <TopicTags ids={data.topics} base="/organizers/" />
+    </header>
+
+    {
+      data.series.length > 0 && (
+        <section>
+          <div class="section__head">
+            <h2>Серии событий</h2>
+          </div>
+          <ul class="grid">
+            {data.series.map((series) => (
+              <li class="card">
+                <h3 class="card__title">
+                  {series.url ? (
+                    <ExternalLink href={series.url}>
+                      {series.name}
+                    </ExternalLink>
+                  ) : (
+                    series.name
+                  )}
+                </h3>
+                {series.cadence && <p class="card__text">{series.cadence}</p>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <section>
+      <div class="section__head">
+        <h2>Ближайшие события</h2>
+      </div>
+      {
+        events.length > 0 ? (
+          <div data-upcoming>
+            <ul class="events">
+              {events.map((event) => (
+                <EventItem event={event} />
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p class="empty">
+            В нашем календаре событий этого организатора сейчас нет.
+            {eventsLink && (
+              <>
+                {' '}
+                Проверь{' '}
+                <ExternalLink href={eventsLink.url}>
+                  его страницу событий
+                </ExternalLink>
+                , а если там что-то появилось — <a href="/contribute/#event">добавь в календарь</a>.
+              </>
+            )}
+          </p>
+        )
+      }
+    </section>
+
+    {
+      talks.length > 0 && (
+        <section>
+          <div class="section__head">
+            <h2>Доклады с его событий</h2>
+          </div>
+          <ul class="grid">
+            {talks.map((talk) => (
+              <TalkCard talk={talk} />
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <p class="meta">
+      <span>Ссылки сверены {formatDay(data.verified)}</span>
+      <ExternalLink href={REPO.file(`data/organizers/${organizer.id}.yaml`)}>Исходник записи</ExternalLink>
+    </p>
+  </article>
+</Base>
+
+<script>
+  import { dropPast } from '../../scripts/past';
+
+  dropPast();
+</script>

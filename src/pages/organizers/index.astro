@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+
+import Filters from '../../components/Filters.astro';
+import Icon from '../../components/Icon.astro';
+import OrganizerCard from '../../components/OrganizerCard.astro';
+import { byText, options } from '../../lib/catalog';
+import { FORMAT, ORGANIZER_KIND } from '../../lib/labels';
+import { heading } from '../../lib/site';
+import { topicTitle } from '../../lib/topics';
+import Base from '../../layouts/Base.astro';
+
+// Порядок алфавитный и другим не бывает: место в каталоге не продаётся.
+const organizers = (await getCollection('organizers')).sort(byText((entry) => entry.data.name));
+
+const filters = [
+  { key: 'topic', label: 'Тема', options: options(organizers.flatMap((entry) => entry.data.topics), topicTitle) },
+  { key: 'kind', label: 'Кто', options: options(organizers.map((entry) => entry.data.kind), (value) => ORGANIZER_KIND[value as keyof typeof ORGANIZER_KIND]) },
+  { key: 'city', label: 'Город', options: options(organizers.flatMap((entry) => entry.data.cities)) },
+  { key: 'format', label: 'Формат', options: options(organizers.flatMap((entry) => entry.data.formats), (value) => FORMAT[value as keyof typeof FORMAT]) },
+];
+---
+
+<Base
+  title={heading('/organizers/')}
+  description="Компании и организаторы, которые проводят события про надёжность и эксплуатацию: где следить за анонсами и где лежат записи."
+>
+  <header class="page-head">
+    <h1>{heading('/organizers/')}</h1>
+    <p class="page-head__lead">
+      Кто проводит события про надёжность и эксплуатацию и где за ними следить. Полезно, когда нужного митапа
+      в <a href="/events/">календаре</a> ещё нет: анонсы раньше всего появляются здесь.
+    </p>
+    <p class="page-head__lead">Размещение бесплатное и не продаётся, порядок алфавитный.</p>
+    <div class="actions">
+      <a class="button button--ghost button--small" href="/contribute/#organizer">
+        <Icon name="circle-plus" size={16} />
+        Добавить организатора
+      </a>
+    </div>
+  </header>
+
+  <Filters filters={filters} view />
+
+  {
+    organizers.length === 0 ? (
+      <p class="empty">
+        Здесь пока пусто. <a href="/contribute/#organizer">Предложи организатора</a>, за которым следишь сам.
+      </p>
+    ) : (
+      <ul class="grid catalog">
+        {organizers.map((organizer) => (
+          <OrganizerCard organizer={organizer} />
+        ))}
+      </ul>
+    )
+  }
+</Base>
