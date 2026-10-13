@@ -1,0 +1,42 @@
+---
+import { topicTitle } from '../lib/topics';
+
+interface Props {
+  ids: string[];
+  /** Адрес списка, который умеет фильтровать по теме: метка станет ссылкой на него. */
+  base?: string;
+  /** Сколько меток показать. Остальные сворачиваются в «+N», их названия слышит скринридер. */
+  max?: number;
+}
+
+const { ids, base, max = ids.length } = Astro.props;
+
+const shown = ids.slice(0, max);
+const rest = ids.slice(max).map(topicTitle);
+---
+
+<ul class="tags" aria-label="Темы">
+  {
+    shown.map((id) => (
+      <li>
+        {base ? (
+          <a class="tag" href={`${base}?topic=${id}`}>
+            {topicTitle(id)}
+          </a>
+        ) : (
+          <span class="tag">{topicTitle(id)}</span>
+        )}
+      </li>
+    ))
+  }
+  {
+    rest.length > 0 && (
+      <li>
+        <span class="tag" title={rest.join(', ')}>
+          <span aria-hidden="true">+{rest.length}</span>
+          <span class="visually-hidden">и ещё: {rest.join(', ')}</span>
+        </span>
+      </li>
+    )
+  }
+</ul>

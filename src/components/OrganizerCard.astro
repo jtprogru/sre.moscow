@@ -1,0 +1,47 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import { tokens } from '../lib/catalog';
+import { LINK_KIND, ORGANIZER_KIND, STATUS } from '../lib/labels';
+import ExternalLink from './ExternalLink.astro';
+import TopicTags from './TopicTags.astro';
+
+interface Props {
+  organizer: CollectionEntry<'organizers'>;
+}
+
+const { organizer } = Astro.props;
+const { data } = organizer;
+---
+
+<li
+  class="card"
+  id={organizer.id}
+  data-item
+  data-topic={tokens(data.topics)}
+  data-kind={data.kind}
+  data-city={tokens(data.cities)}
+  data-format={tokens(data.formats)}
+>
+  <p class="meta">
+    <span class="eyebrow">{ORGANIZER_KIND[data.kind]}</span>
+    {data.status !== 'active' && <span class="badge badge--warn">{STATUS[data.status]}</span>}
+  </p>
+  <h2 class="card__title"><a href={`/organizers/${organizer.id}/`}>{data.name}</a></h2>
+  <p class="card__text">{data.why}</p>
+  {data.series.length > 0 && <p class="meta">{data.series.map((series) => <span>{series.name}</span>)}</p>}
+  <div class="card__foot">
+    <ul class="links">
+      {
+        data.links.map((link) => (
+          <li>
+            <ExternalLink href={link.url}>
+              {link.label ?? LINK_KIND[link.kind]}
+            </ExternalLink>
+          </li>
+        ))
+      }
+    </ul>
+    <TopicTags ids={data.topics} base="/organizers/" max={2} />
+  </div>
+</li>

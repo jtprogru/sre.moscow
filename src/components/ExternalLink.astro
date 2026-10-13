@@ -1,0 +1,20 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+// Ссылка наружу: всё, что ведёт не на страницы сайта. Открывается в новой
+// вкладке, чтобы каталог оставался открытым. Остальные атрибуты уходят в <a>
+// как есть; <a> с внешним адресом прямо в разметке страниц не пишем.
+interface Props extends HTMLAttributes<'a'> {
+  href: string;
+  /** Дополняет noopener, а не заменяет его: у ссылок профиля это me. */
+  rel?: string;
+}
+
+const { rel, ...attrs } = Astro.props;
+
+// Края содержимого обрезаются: перенос строки после текста ссылки в разметке
+// страницы иначе стал бы подчёркнутым пробелом перед запятой.
+const content = (await Astro.slots.render('default')).trim();
+---
+
+<a {...attrs} target="_blank" rel={['noopener', rel].filter(Boolean).join(' ')} set:html={content} />

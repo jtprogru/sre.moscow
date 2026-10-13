@@ -1,0 +1,96 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import type { EventEntry } from '../lib/catalog';
+import { place, tokens } from '../lib/catalog';
+import { dayNumber, dayOf, endOfEvent, formatDay, formatDays, formatTime, monthShort, today, weekday } from '../lib/dates';
+import { countryName, FORMAT, LANG_SHORT, PRICE } from '../lib/labels';
+import ExternalLink from './ExternalLink.astro';
+import TopicTags from './TopicTags.astro';
+
+interface Props {
+  event: EventEntry;
+  /** Адрес списка для меток тем; в карточке организатора не нужен. */
+  base?: string;
+  /** Доклады с этого события, которые есть в каталоге. Передаёт архив. */
+  talks?: CollectionEntry<'talks'>[];
+}
+
+const { event, base, talks = [] } = Astro.props;
+const { data } = event;
+
+const time = formatTime(data);
+const cfpOpen = data.cfp && data.cfp.deadline >= today();
+---
+
+<li
+  class="event"
+  id={event.id}
+  data-item
+  data-ends={endOfEvent(data).toISOString()}
+  data-topic={tokens(data.topics)}
+  data-format={data.format}
+  data-city={data.city}
+  data-lang={data.lang}
+  data-price={data.price}
+>
+  <div class="event__date" aria-hidden="true">
+    <span class="event__day">{dayNumber(data.start)}</span>
+    <span class="event__month">{monthShort(data.start)}</span>
+    <span class="event__weekday">{weekday(data.start)}</span>
+  </div>
+  <div class="event__body">
+    <h3 class="event__title"><ExternalLink href={data.url}>{data.title}</ExternalLink></h3>
+    <p class="meta">
+      <time datetime={dayOf(data.start)}>{formatDays(data)}</time>
+      {time && <span>{time}</span>}
+      <span>{place(data, countryName)}</span>
+    </p>
+    <p class="meta">
+      {
+        data.organizer.ref ? (
+          <a href={`/organizers/${data.organizer.ref.id}/`}>{data.organizer.name}</a>
+        ) : (
+          <span>{data.organizer.name}</span>
+        )
+      }
+      <span>{FORMAT[data.format]}</span>
+      <span>{PRICE[data.price]}</span>
+      <span>{LANG_SHORT[data.lang]}</span>
+      {
+        cfpOpen && data.cfp && (
+          <ExternalLink class="badge badge--tip" href={data.cfp.url}>
+            заявки до {formatDay(data.cfp.deadline)}
+          </ExternalLink>
+        )
+      }
+    </p>
+    {
+      data.recaps.map((recap) => (
+        <p class="meta">
+          <span class="eyebrow">Разбор</span>
+          <ExternalLink href={recap.url}>
+            {recap.title}
+          </ExternalLink>
+          {
+            recap.author.person ? (
+              <a href={`/people/${recap.author.person.id}/`}>{recap.author.name}</a>
+            ) : (
+              <span>{recap.author.name}</span>
+            )
+          }
+        </p>
+      ))
+    }
+    {
+      talks.map((talk) => (
+        <p class="meta">
+          <span class="eyebrow">Доклад</span>
+          <a href={`/talks/#${talk.id}`}>{talk.data.title}</a>
+          <span>{talk.data.speakers.map((speaker) => speaker.name).join(', ')}</span>
+        </p>
+      ))
+    }
+    <TopicTags ids={data.topics} base={base} max={2} />
+  </div>
+</li>

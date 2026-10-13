@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import { tokens } from '../lib/catalog';
+import { COMMUNITY_KIND, LANG_SHORT, PLATFORM, STATUS } from '../lib/labels';
+import ExternalLink from './ExternalLink.astro';
+import TopicTags from './TopicTags.astro';
+
+interface Props {
+  community: CollectionEntry<'communities'>;
+  /** Уровень заголовка карточки: 2 в каталоге, 3 внутри блока со своим заголовком. */
+  level?: 2 | 3;
+}
+
+const { community, level = 2 } = Astro.props;
+const { data } = community;
+const Title = level === 3 ? 'h3' : 'h2';
+---
+
+<li
+  class="card"
+  id={community.id}
+  data-item
+  data-topic={tokens(data.topics)}
+  data-kind={data.kind}
+  data-platform={data.platform}
+  data-lang={data.lang}
+>
+  <p class="meta">
+    <span class="eyebrow">
+      {COMMUNITY_KIND[data.kind]} · {PLATFORM[data.platform]}
+    </span>
+    <span>{LANG_SHORT[data.lang]}</span>
+    {data.status !== 'active' && <span class="badge badge--warn">{STATUS[data.status]}</span>}
+  </p>
+  <Title class="card__title">
+    <ExternalLink href={data.url}>
+      {data.title}
+    </ExternalLink>
+  </Title>
+  <p class="card__text">{data.description}</p>
+  <div class="card__foot">
+    <TopicTags ids={data.topics} base="/communities/" max={2} />
+  </div>
+</li>

@@ -1,0 +1,59 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getEntry } from 'astro:content';
+
+import { eventHref, tokens } from '../lib/catalog';
+import { formatDay } from '../lib/dates';
+import { LANG_SHORT, LEVEL } from '../lib/labels';
+import ExternalLink from './ExternalLink.astro';
+import TopicTags from './TopicTags.astro';
+
+interface Props {
+  talk: CollectionEntry<'talks'>;
+  /** Уровень заголовка карточки: 2 в каталоге, 3 внутри блока со своим заголовком. */
+  level?: 2 | 3;
+}
+
+const { talk, level = 2 } = Astro.props;
+const { data } = talk;
+const Title = level === 3 ? 'h3' : 'h2';
+
+// Ссылку на событие проверил check-data, но страница не должна падать, если
+// её собрали в обход проверки: без записи остаётся просто название.
+const event = data.event.ref ? await getEntry(data.event.ref) : undefined;
+---
+
+<li class="card" id={talk.id} data-item data-topic={tokens(data.topics)} data-level={data.level} data-lang={data.lang}>
+  <p class="meta">
+    <span class="eyebrow">{LEVEL[data.level]}</span>
+    <span>{LANG_SHORT[data.lang]}</span>
+  </p>
+  <Title class="card__title"><ExternalLink href={data.video}>{data.title}</ExternalLink></Title>
+  <p class="meta">
+    {
+      data.speakers.map((speaker) =>
+        speaker.person ? <a href={`/people/${speaker.person.id}/`}>{speaker.name}</a> : <span>{speaker.name}</span>,
+      )
+    }
+  </p>
+  <p class="card__text">{data.why}</p>
+  <div class="card__foot">
+    <p class="meta">
+      {event ? <a href={eventHref(event)}>{data.event.name}</a> : <span>{data.event.name}</span>}
+      <time datetime={data.date}>{formatDay(data.date)}</time>
+    </p>
+    <ul class="links">
+      <li><ExternalLink href={data.video}>Запись</ExternalLink></li>
+      {
+        data.slides && (
+          <li>
+            <ExternalLink href={data.slides}>
+              Слайды
+            </ExternalLink>
+          </li>
+        )
+      }
+    </ul>
+    <TopicTags ids={data.topics} base="/talks/" max={2} />
+  </div>
+</li>
