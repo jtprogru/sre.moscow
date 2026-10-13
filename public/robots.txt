@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sre.moscow/sitemap-index.xml
