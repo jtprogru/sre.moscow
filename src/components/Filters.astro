@@ -1,0 +1,160 @@
+---
+import type { Option } from '../lib/catalog';
+import Icon from './Icon.astro';
+import ViewSwitch from './ViewSwitch.astro';
+
+// Панель над списком: фильтры, счётчик показанного и переключатель вида.
+// Разметка списка о фильтрах ничего не знает, кроме атрибутов:
+//
+//   data-item             — элемент, который фильтруется
+//   data-<key>="a|b"      — его значения по фильтру <key>
+//   data-group            — обёртка, которая прячется, когда в ней пусто
+//
+// Панель отрисована скрытой и показывается скриптом: без JS страница отдаёт
+// весь список, а не органы управления, которые ничего не делают.
+//
+// На телефоне поля свёрнуты в кнопку «Фильтры» с числом выбранных, чтобы
+// первый экран занимали записи.
+
+interface Filter {
+  key: string;
+  label: string;
+  options: Option[];
+}
+
+interface Props {
+  filters: Filter[];
+  /** Показать переключатель «списком / карточками». Нужен каталогам из карточек. */
+  view?: boolean;
+}
+
+const { view = false } = Astro.props;
+
+// Фильтр с одним вариантом ничего не отсекает — его не показываем.
+const filters = Astro.props.filters.filter((filter) => filter.options.length > 1);
+---
+
+{
+  (filters.length > 0 || view) && (
+    <div class="toolbar" data-toolbar hidden>
+      {filters.length > 0 && (
+        <form class="filters" id="filters" data-filters>
+          <button
+            class="button button--ghost button--small filters__toggle"
+            type="button"
+            data-filters-toggle
+            aria-expanded="false"
+            aria-controls="filters-fields"
+          >
+            <Icon name="sliders-horizontal" size={16} />
+            Фильтры
+            <span class="filters__active" data-filters-active hidden />
+          </button>
+          <div class="filters__fields" id="filters-fields">
+            {filters.map((filter) => (
+              <div class="filters__field">
+                <label for={`filter-${filter.key}`}>{filter.label}</label>
+                <select id={`filter-${filter.key}`} name={filter.key}>
+                  <option value="">все</option>
+                  {filter.options.map((option) => (
+                    <option value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
+        </form>
+      )}
+      <div class="toolbar__row">
+        {filters.length > 0 && (
+          <p class="filters__status">
+            <span data-filters-count aria-live="polite" />
+            {/* Кнопка стоит вне формы, чтобы сброс не трогал переключатель вида. */}
+            <button class="filters__reset" type="reset" form="filters" data-filters-reset hidden>
+              <Icon name="x" size={16} />
+              Сбросить
+            </button>
+          </p>
+        )}
+        {view && <ViewSwitch />}
+      </div>
+    </div>
+  )
+}
+{
+  filters.length > 0 && (
+    <p class="empty" data-filters-empty hidden>
+      Под такие условия ничего не подошло.
+    </p>
+  )
+}
+
+<script>
+  import { dropPast } from '../scripts/past';
+
+  // Сначала убираем прошедшее, потом считаем: иначе счётчик учтёт то, чего
+  // на странице уже нет.
+  dropPast();
+
+  const toolbar = document.querySelector<HTMLElement>('[data-toolbar]');
+  const form = document.querySelector<HTMLFormElement>('[data-filters]');
+
+  if (toolbar) toolbar.hidden = false;
+
+  if (form && toolbar) {
+    const items = [...document.querySelectorAll<HTMLElement>('[data-item]')];
+    const groups = [...document.querySelectorAll<HTMLElement>('[data-group]')];
+    const selects = [...form.querySelectorAll<HTMLSelectElement>('select')];
+    const count = toolbar.querySelector<HTMLElement>('[data-filters-count]');
+    const reset = toolbar.querySelector<HTMLElement>('[data-filters-reset]');
+    const toggle = form.querySelector<HTMLButtonElement>('[data-filters-toggle]');
+    const chosen = form.querySelector<HTMLElement>('[data-filters-active]');
+    const empty = document.querySelector<HTMLElement>('[data-filters-empty]');
+
+    const apply = () => {
+      const active = selects.filter((select) => select.value);
+      let shown = 0;
+
+      for (const item of items) {
+        const match = active.every((select) => (item.dataset[select.name] ?? '').split('|').includes(select.value));
+        item.hidden = !match;
+        if (match) shown += 1;
+      }
+      for (const group of groups) {
+        group.hidden = !group.querySelector('[data-item]:not([hidden])');
+      }
+
+      if (count) count.textContent = `Показано ${shown} из ${items.length}`;
+      if (reset) reset.hidden = active.length === 0;
+      if (chosen) {
+        chosen.textContent = String(active.length);
+        chosen.hidden = active.length === 0;
+      }
+      toggle?.setAttribute('aria-label', active.length ? `Фильтры, выбрано: ${active.length}` : 'Фильтры');
+      if (empty) empty.hidden = shown > 0;
+
+      // Состояние фильтров живёт в адресе: ссылку на отфильтрованный список
+      // можно переслать, а метки тем на карточках ведут сюда же.
+      const params = new URLSearchParams(active.map((select) => [select.name, select.value]));
+      const query = params.toString();
+      history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
+    };
+
+    const params = new URLSearchParams(location.search);
+    for (const select of selects) {
+      const value = params.get(select.name);
+      if (value && [...select.options].some((option) => option.value === value)) select.value = value;
+    }
+
+    // На телефоне поля раскрывает кнопка; на широком экране они видны всегда,
+    // и кнопки нет.
+    toggle?.addEventListener('click', () => {
+      const open = form.toggleAttribute('data-open');
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+
+    form.addEventListener('change', apply);
+    form.addEventListener('reset', () => setTimeout(apply));
+    apply();
+  }
+</script>

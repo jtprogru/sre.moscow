@@ -1,0 +1,71 @@
+---
+import Icon from './Icon.astro';
+
+// Вид каталога: списком или карточками. Выбор один на все каталоги и хранится
+// в браузере. Пока читатель не выбрал, телефон показывает список, экран от
+// 600 px — карточки: это решает инлайн-скрипт в src/layouts/Base.astro до
+// первой отрисовки, здесь только переключатель.
+//
+// Без JS переключателя нет, каталог остаётся карточками.
+
+const VIEWS = [
+  { value: 'list', label: 'Списком', icon: 'list' },
+  { value: 'cards', label: 'Карточками', icon: 'layout-grid' },
+] as const;
+---
+
+<fieldset class="view-switch" data-view-switch hidden>
+  <legend class="visually-hidden">Вид каталога</legend>
+  {
+    VIEWS.map((view) => (
+      <label class="choice choice--icon" title={view.label}>
+        <input type="radio" name="view" value={view.value} />
+        <span>
+          <Icon name={view.icon} />
+          <span class="visually-hidden">{view.label}</span>
+        </span>
+      </label>
+    ))
+  }
+</fieldset>
+
+<script>
+  const root = document.documentElement;
+  const narrow = matchMedia('(max-width: 599px)');
+
+  const stored = (): string | null => {
+    try {
+      return localStorage.getItem('view');
+    } catch {
+      return null;
+    }
+  };
+
+  for (const box of document.querySelectorAll<HTMLFieldSetElement>('[data-view-switch]')) {
+    const choices = [...box.querySelectorAll<HTMLInputElement>('input')];
+    const sync = () => {
+      for (const choice of choices) choice.checked = choice.value === root.dataset.view;
+    };
+
+    for (const choice of choices) {
+      choice.addEventListener('change', () => {
+        root.dataset.view = choice.value;
+        try {
+          localStorage.setItem('view', choice.value);
+        } catch {
+          // Хранилище недоступно — выбор не запомнится, но на этой странице сработает.
+        }
+      });
+    }
+
+    // Экран повернули или окно сузили: пока выбора нет, вид идёт за шириной.
+    narrow.addEventListener('change', () => {
+      if (stored()) return;
+      root.dataset.view = narrow.matches ? 'list' : 'cards';
+      sync();
+    });
+
+    sync();
+    box.hidden = false;
+  }
+</script>

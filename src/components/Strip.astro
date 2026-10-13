@@ -1,0 +1,21 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+// Полоса с действием: короткий заголовок и текст слева, одна-две кнопки справа.
+// Стоит внизу страницы там, где читателю есть что сделать дальше. На телефоне
+// кнопки уходят под текст на всю ширину. Остальные атрибуты уходят в <aside>.
+
+interface Props extends HTMLAttributes<'aside'> {
+  title: string;
+}
+
+const { title, ...rest } = Astro.props;
+---
+
+<aside class="strip" {...rest}>
+  <div class="strip__body">
+    <h2 class="strip__title">{title}</h2>
+    <p class="strip__text"><slot /></p>
+  </div>
+  <div class="strip__actions"><slot name="actions" /></div>
+</aside>
