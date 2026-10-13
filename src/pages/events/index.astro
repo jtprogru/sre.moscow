@@ -1,0 +1,131 @@
+---
+import EventItem from '../../components/EventItem.astro';
+import Filters from '../../components/Filters.astro';
+import Icon from '../../components/Icon.astro';
+import Strip from '../../components/Strip.astro';
+import { getEvents, options, place } from '../../lib/catalog';
+import { monthTitle } from '../../lib/dates';
+import { countryName, FORMAT, LANG } from '../../lib/labels';
+import { heading, SITE } from '../../lib/site';
+import { topicTitle } from '../../lib/topics';
+import Base from '../../layouts/Base.astro';
+
+const { upcoming, past } = await getEvents();
+
+// Группы по месяцам в порядке дат: Map сохраняет порядок вставки.
+const months = Map.groupBy(upcoming, (event) => monthTitle(event.data.start));
+
+const filters = [
+  { key: 'topic', label: 'Тема', options: options(upcoming.flatMap((event) => event.data.topics), topicTitle) },
+  { key: 'format', label: 'Формат', options: options(upcoming.map((event) => event.data.format), (value) => FORMAT[value as keyof typeof FORMAT]) },
+  { key: 'city', label: 'Город', options: options(upcoming.flatMap((event) => event.data.city ?? [])) },
+  { key: 'lang', label: 'Язык', options: options(upcoming.map((event) => event.data.lang), (value) => LANG[value as keyof typeof LANG]) },
+];
+
+const ATTENDANCE = {
+  offline: 'https://schema.org/OfflineEventAttendanceMode',
+  online: 'https://schema.org/OnlineEventAttendanceMode',
+  hybrid: 'https://schema.org/MixedEventAttendanceMode',
+};
+
+const jsonLd = upcoming.map(({ id, data }) => ({
+  '@type': 'Event',
+  '@id': `${SITE.url}/events/#${id}`,
+  name: data.title,
+  startDate: data.start,
+  // Конец указываем, только если он есть в записи: выдуманное время хуже пропуска.
+  ...(data.end ? { endDate: data.end } : {}),
+  eventAttendanceMode: ATTENDANCE[data.format],
+  eventStatus: 'https://schema.org/EventScheduled',
+  url: data.url,
+  inLanguage: data.lang,
+  isAccessibleForFree: data.price === 'free',
+  organizer: { '@type': 'Organization', name: data.organizer.name },
+  location:
+    data.format === 'online' || !data.city
+      ? { '@type': 'VirtualLocation', url: data.url }
+      : {
+          '@type': 'Place',
+          name: place(data, countryName),
+          address: { '@type': 'PostalAddress', addressLocality: data.city, addressCountry: data.country },
+        },
+}));
+---
+
+<Base
+  title={heading('/events/')}
+  description="Календарь конференций и митапов про надёжность, эксплуатацию и observability: что будет в ближайшие месяцы."
+  jsonLd={jsonLd}
+>
+  <header class="page-head">
+    <h1>{heading('/events/')}</h1>
+    <p class="page-head__lead">
+      Отобранные конференции и митапы, где надёжность и эксплуатация — главная тема. Полной афишей каталог
+      не занимается: за ней иди <a href="/organizers/">к организаторам</a>. Время указано местное для события.
+    </p>
+    <div class="actions">
+      <a class="button button--small" href={`webcal://${new URL(SITE.url).host}/events.ics`}>
+        <Icon name="calendar-plus" size={16} />
+        Подписаться на календарь
+      </a>
+      <a class="button button--ghost button--small" href="/contribute/#event">
+        <Icon name="circle-plus" size={16} />
+        Добавить событие
+      </a>
+      {
+        past.length > 0 && (
+          <a class="button button--ghost button--small" href="/events/archive/">
+            <Icon name="history" size={16} />
+            Что уже было
+          </a>
+        )
+      }
+    </div>
+  </header>
+
+  <Strip title="Страница собрана давно" data-stale-note hidden>
+    Прошедшие события скрыты, новых здесь может не быть. Свежие анонсы смотри у организаторов.
+    <a slot="actions" class="button button--ghost button--small" href="/organizers/">
+      <Icon name="megaphone" size={16} />
+      Организаторы
+    </a>
+  </Strip>
+
+  <Filters filters={filters} />
+
+  {
+    upcoming.length === 0 ? (
+      <p class="empty">
+        В календаре пока пусто. <a href="/contribute/#event">Добавь событие</a>, если знаешь о нём.
+      </p>
+    ) : (
+      <div data-upcoming>
+        {[...months].map(([title, events]) => (
+          <section class="month" data-group>
+            <h2 class="month__title">{title}</h2>
+            <ul class="events">
+              {events.map((event) => (
+                <EventItem event={event} base="/events/" />
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    )
+  }
+
+  <section class="section">
+    <Strip title="Не нашёл нужного?">
+      Календарь неизбежно неполон: событие попадает сюда, когда его кто-то добавил. У организаторов анонсы
+      появляются раньше всего.
+      <a slot="actions" class="button button--small" href="/organizers/">
+        <Icon name="megaphone" size={16} />
+        Организаторы
+      </a>
+      <a slot="actions" class="button button--ghost button--small" href="/contribute/#event">
+        <Icon name="circle-plus" size={16} />
+        Добавить событие
+      </a>
+    </Strip>
+  </section>
+</Base>

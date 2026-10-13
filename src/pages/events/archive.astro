@@ -1,0 +1,62 @@
+---
+import { getCollection } from 'astro:content';
+
+import EventItem from '../../components/EventItem.astro';
+import Filters from '../../components/Filters.astro';
+import Icon from '../../components/Icon.astro';
+import { getEvents, options } from '../../lib/catalog';
+import { FORMAT } from '../../lib/labels';
+import { topicTitle } from '../../lib/topics';
+import Base from '../../layouts/Base.astro';
+
+const { past } = await getEvents();
+
+const years = Map.groupBy(past, (event) => event.data.start.slice(0, 4));
+
+// Прошедшее событие — точка, к которой привязано то, что от него осталось:
+// доклады из каталога и разборы участников.
+const talks = (await getCollection('talks')).sort((a, b) => a.data.title.localeCompare(b.data.title, 'ru'));
+const talksOf = Map.groupBy(talks, (talk) => talk.data.event.ref?.id ?? '');
+
+const filters = [
+  { key: 'topic', label: 'Тема', options: options(past.flatMap((event) => event.data.topics), topicTitle) },
+  { key: 'format', label: 'Формат', options: options(past.map((event) => event.data.format), (value) => FORMAT[value as keyof typeof FORMAT]) },
+  { key: 'city', label: 'Город', options: options(past.flatMap((event) => event.data.city ?? [])) },
+];
+---
+
+<Base
+  title="Архив событий"
+  description="Прошедшие конференции и митапы про надёжность и эксплуатацию: доклады с них и разборы участников."
+>
+  <a class="back" href="/events/">
+    <Icon name="arrow-left" size={16} />
+    Предстоящие события
+  </a>
+  <header class="page-head">
+    <h1>Архив событий</h1>
+    <p class="page-head__lead">
+      Что уже было и что от этого осталось: у события стоят доклады из <a href="/talks/">каталога</a> и разборы
+      участников.
+    </p>
+  </header>
+
+  <Filters filters={filters} />
+
+  {
+    past.length === 0 ? (
+      <p class="empty">Архив пока пуст.</p>
+    ) : (
+      [...years].map(([year, events]) => (
+        <section class="month" data-group>
+          <h2 class="month__title">{year}</h2>
+          <ul class="events">
+            {events.map((event) => (
+              <EventItem event={event} base="/events/archive/" talks={talksOf.get(event.id)} />
+            ))}
+          </ul>
+        </section>
+      ))
+    )
+  }
+</Base>
