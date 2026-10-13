@@ -1,0 +1,38 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import { PHOTO_SIZES, initials, loadPhoto, photoPath, type PhotoSize } from '../lib/photo';
+
+// Лицо профиля: фото, если человек дал ссылку и картинка скачалась, иначе инициалы.
+// Имя всегда стоит рядом текстом, поэтому скринридер картинку пропускает.
+
+interface Props {
+  person: CollectionEntry<'people'>;
+  /** card — в карточке каталога, profile — на странице профиля. */
+  size?: PhotoSize;
+}
+
+const { person, size = 'card' } = Astro.props;
+const { name, photo } = person.data;
+
+const loaded = photo ? (await loadPhoto(photo)) !== null : false;
+const side = PHOTO_SIZES[size];
+---
+
+{
+  loaded ? (
+    <img
+      class:list={['avatar', `avatar--${size}`]}
+      src={photoPath(person.id, size)}
+      width={side}
+      height={side}
+      alt=""
+      loading={size === 'card' ? 'lazy' : 'eager'}
+      decoding="async"
+    />
+  ) : (
+    <span class:list={['avatar', `avatar--${size}`]} aria-hidden="true">
+      {initials(name)}
+    </span>
+  )
+}

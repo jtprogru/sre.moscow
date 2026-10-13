@@ -1,0 +1,40 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import { tokens } from '../lib/catalog';
+import { OPEN_TO } from '../lib/labels';
+import Avatar from './Avatar.astro';
+import TopicTags from './TopicTags.astro';
+
+interface Props {
+  person: CollectionEntry<'people'>;
+  /** Уровень заголовка карточки: 2 в каталоге, 3 внутри блока со своим заголовком. */
+  level?: 2 | 3;
+}
+
+const { person, level = 2 } = Astro.props;
+const { data } = person;
+const Title = level === 3 ? 'h3' : 'h2';
+---
+
+<li class="card" id={person.id} data-item data-topic={tokens(data.topics)} data-open={tokens(data.open_to)}>
+  <div class="card__head">
+    <Avatar person={person} />
+    <Title class="card__title">
+      <a href={`/people/${person.id}/`}>{data.name}</a>
+    </Title>
+  </div>
+  <p class="card__text">{data.bio}</p>
+  <div class="card__foot">
+    {
+      data.open_to.length > 0 && (
+        <p class="meta">
+          {data.open_to.map((value) => (
+            <span class="badge badge--tip">{OPEN_TO[value]}</span>
+          ))}
+        </p>
+      )
+    }
+    <TopicTags ids={data.topics} base="/people/" max={2} />
+  </div>
+</li>
