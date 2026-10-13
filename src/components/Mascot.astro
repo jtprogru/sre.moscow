@@ -1,0 +1,17 @@
+---
+import { owlAlone, owlOnPanel } from '../brand/mascot';
+
+// Маскот — сова на дежурстве. scene выбирает сцену: perch — сова на панели
+// бюджета ошибок, solo — сова одна. Рисунок описан в src/brand/mascot.ts.
+interface Props {
+  scene: 'perch' | 'solo';
+  class?: string;
+}
+
+const SCENES = { perch: owlOnPanel, solo: owlAlone };
+
+const { scene, class: className } = Astro.props;
+const { viewBox, label, body } = SCENES[scene]();
+---
+
+<svg class:list={['mascot', className]} viewBox={viewBox} fill="none" role="img" aria-label={label} set:html={body} />
