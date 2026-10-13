@@ -225,6 +225,16 @@ pre code { background: none; padding: 0; font-size: inherit; }
 @media (pointer: coarse) {
   .icon-button { width: var(--tap-min); height: var(--tap-min); }
   .search-trigger { height: var(--tap-min); }
+
+  /* Пункт меню на планшете — цель под палец. Растёт и ширина: слово «Люди»
+     короче 44 px. */
+  .site-nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--tap-min);
+    min-height: var(--tap-min);
+  }
 }
 
 .menu-button { display: none; }
