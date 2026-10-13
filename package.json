@@ -1,0 +1,29 @@
+{
+  "name": "sre-moscow",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "sre.moscow — каталог SRE-сообщества: чаты и каналы, доклады, люди, календарь мероприятий, организаторы",
+  "packageManager": "bun@1.4.2",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check",
+    "lint": "markdownlint-cli2 \"**/*.md\""
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.5",
+    "sharp": "^0.35.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "ical.js": "^2.2.1",
+    "markdownlint-cli2": "^0.23.3",
+    "playwright": "1.62.1",
+    "typescript": "^6.0.3",
+    "yaml": "^2.9.1"
+  }
+}
