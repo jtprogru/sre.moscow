@@ -1,0 +1,122 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+import Avatar from '../../components/Avatar.astro';
+import ExternalLink from '../../components/ExternalLink.astro';
+import Icon from '../../components/Icon.astro';
+import Mark from '../../components/Mark.astro';
+import Strip from '../../components/Strip.astro';
+import TalkCard from '../../components/TalkCard.astro';
+import TopicTags from '../../components/TopicTags.astro';
+import type { IconName } from '../../lib/icons';
+import { OPEN_TO, PERSON_LINK } from '../../lib/labels';
+import type { MarkName } from '../../lib/marks';
+import { loadPhoto, photoPath } from '../../lib/photo';
+import { REPO, SITE } from '../../lib/site';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const people = await getCollection('people');
+  return people.map((person) => ({ params: { id: person.id }, props: { person } }));
+}
+
+interface Props {
+  person: CollectionEntry<'people'>;
+}
+
+const { person } = Astro.props;
+const { data } = person;
+
+const talks = (await getCollection('talks'))
+  .filter((talk) => talk.data.speakers.some((speaker) => speaker.person?.id === person.id))
+  .sort((a, b) => b.data.date.localeCompare(a.data.date));
+
+const links = Object.entries(data.links) as [keyof typeof PERSON_LINK, string][];
+
+// Ссылку рисует знак площадки, а где знака нет — иконка из общего набора.
+const LINK_GLYPH = {
+  telegram: { mark: 'telegram' },
+  github: { mark: 'github' },
+  linkedin: { icon: 'briefcase' },
+  mastodon: { mark: 'mastodon' },
+  youtube: { mark: 'youtube' },
+  site: { icon: 'globe' },
+} satisfies Record<keyof typeof PERSON_LINK, { mark: MarkName } | { icon: IconName }>;
+
+const hasPhoto = data.photo ? (await loadPhoto(data.photo)) !== null : false;
+
+const jsonLd = [
+  {
+    '@type': 'ProfilePage',
+    '@id': `${SITE.url}/people/${person.id}/#profile`,
+    mainEntity: {
+      '@type': 'Person',
+      name: data.name,
+      description: data.bio,
+      ...(hasPhoto && { image: `${SITE.url}${photoPath(person.id, 'profile')}` }),
+      sameAs: links.map(([, url]) => url),
+    },
+  },
+];
+---
+
+<Base title={data.name} description={data.bio} jsonLd={jsonLd}>
+  <a class="back" href="/people/">
+    <Icon name="arrow-left" size={16} />
+    Все люди
+  </a>
+  <article class="profile">
+    <header class="page-head profile__head">
+      <Avatar person={person} size="profile" />
+      <div class="profile__body">
+        <h1>{data.name}</h1>
+        <p class="profile__bio">{data.bio}</p>
+        {
+          data.open_to.length > 0 && (
+            <p class="meta">
+              {data.open_to.map((value) => (
+                <span class="badge badge--tip">{OPEN_TO[value]}</span>
+              ))}
+            </p>
+          )
+        }
+        <div class="actions">
+          {
+            links.map(([kind, url]) => {
+              const glyph = LINK_GLYPH[kind];
+              return (
+                <ExternalLink class="icon-button" href={url} rel="me" aria-label={PERSON_LINK[kind]} title={PERSON_LINK[kind]}>
+                  {'mark' in glyph ? <Mark name={glyph.mark} /> : <Icon name={glyph.icon} />}
+                </ExternalLink>
+              );
+            })
+          }
+        </div>
+        <TopicTags ids={data.topics} base="/people/" />
+      </div>
+    </header>
+
+    {
+      talks.length > 0 && (
+        <section>
+          <div class="section__head">
+            <h2>Публичные выступления</h2>
+          </div>
+          <ul class="grid">
+            {talks.map((talk) => (
+              <TalkCard talk={talk} />
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <Strip title="Это твой профиль?">
+      Он опубликован с согласия человека. Поправим или уберём по первой просьбе, причину не спрашиваем.
+      <ExternalLink slot="actions" class="button button--ghost button--small" href={REPO.issue('fix')}>
+        <Icon name="pencil" size={16} />
+        Исправить или удалить
+      </ExternalLink>
+    </Strip>
+  </article>
+</Base>

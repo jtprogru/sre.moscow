@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+
+import Filters from '../../components/Filters.astro';
+import Icon from '../../components/Icon.astro';
+import PersonCard from '../../components/PersonCard.astro';
+import { byText, options } from '../../lib/catalog';
+import { OPEN_TO } from '../../lib/labels';
+import { heading } from '../../lib/site';
+import { topicTitle } from '../../lib/topics';
+import Base from '../../layouts/Base.astro';
+
+const people = (await getCollection('people')).sort(byText((entry) => entry.data.name));
+
+const filters = [
+  { key: 'topic', label: 'Тема', options: options(people.flatMap((entry) => entry.data.topics), topicTitle) },
+  { key: 'open', label: 'Зачем обращаться', options: options(people.flatMap((entry) => entry.data.open_to), (value) => OPEN_TO[value as keyof typeof OPEN_TO]) },
+];
+---
+
+<Base
+  title={heading('/people/')}
+  description="Люди из SRE-сообщества, которые сами разрешили к ним обращаться: с вопросом, за менторством или с приглашением выступить."
+>
+  <header class="page-head">
+    <h1>{heading('/people/')}</h1>
+    <p class="page-head__lead">
+      Те, кто сам разрешил к себе обращаться: с вопросом, за менторством или с приглашением выступить.
+    </p>
+    <p class="page-head__lead">
+      Профиль появляется только по заявке человека или с его явного согласия и убирается по первому запросу.
+      Доклады живут отдельно — в разделе <a href="/talks/">«Доклады»</a> спикер указан и без профиля.
+    </p>
+    <div class="actions">
+      <a class="button button--ghost button--small" href="/contribute/#profile">
+        <Icon name="circle-plus" size={16} />
+        Добавить свой профиль
+      </a>
+    </div>
+  </header>
+
+  <Filters filters={filters} view />
+
+  {
+    people.length === 0 ? (
+      <p class="empty">
+        Профилей пока нет: мы никого не добавляем без согласия. <a href="/contribute/#profile">Добавь свой</a> —
+        это один файл.
+      </p>
+    ) : (
+      <ul class="grid catalog">
+        {people.map((person) => (
+          <PersonCard person={person} />
+        ))}
+      </ul>
+    )
+  }
+</Base>
