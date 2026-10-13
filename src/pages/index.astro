@@ -1,0 +1,217 @@
+---
+import { getCollection } from 'astro:content';
+
+import CommunityCard from '../components/CommunityCard.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import Icon from '../components/Icon.astro';
+import Mascot from '../components/Mascot.astro';
+import PersonCard from '../components/PersonCard.astro';
+import TalkCard from '../components/TalkCard.astro';
+import { byText, eventHref, getEvents, place } from '../lib/catalog';
+import { endOfEvent, formatDays } from '../lib/dates';
+import { countryName } from '../lib/labels';
+import { heading, REPO, SITE } from '../lib/site';
+import Base from '../layouts/Base.astro';
+
+// Главная показывает то, что каталог отбирает сам и чего не соберёт
+// автоматическая афиша: доклады с причиной посмотреть, места, где можно
+// спросить, людей, к которым можно обратиться. От календаря здесь одна строка.
+const BLOCK = 3;
+// Блок людей появляется, когда профилей хватает на ряд: один профиль в нём
+// выглядел бы визиткой автора.
+const PEOPLE_MIN = 3;
+
+const [allTalks, allCommunities, allPeople, { upcoming }] = await Promise.all([
+  getCollection('talks'),
+  getCollection('communities'),
+  getCollection('people'),
+  getEvents(),
+]);
+
+// Чисел на главной два, и оба про то, чем каталог силён: сколько в нём докладов
+// и сколько сообществ. Счётчиков событий, организаторов и людей нет — так
+// решено, правило записано в BRAND.md.
+const tiles = [
+  { href: '/talks/', count: allTalks.length, text: 'С записью и причиной посмотреть' },
+  { href: '/communities/', count: allCommunities.length, text: 'Чаты, каналы, подкасты и рассылки' },
+] as const;
+
+const talks = allTalks.sort((a, b) => b.data.date.localeCompare(a.data.date)).slice(0, BLOCK);
+
+// «Где поговорить» — сначала чаты и форумы: туда приходят с вопросом. Каналы,
+// подкасты и рассылки добирают ряд, если чатов не хватило.
+const talkable = (kind: string) => Number(kind !== 'chat' && kind !== 'forum');
+const communities = allCommunities
+  .filter((entry) => entry.data.status === 'active')
+  .sort(byText((entry) => entry.data.title))
+  .sort((a, b) => talkable(a.data.kind) - talkable(b.data.kind))
+  .slice(0, BLOCK);
+
+const people = allPeople.length >= PEOPLE_MIN ? allPeople.sort(byText((entry) => entry.data.name)).slice(0, BLOCK) : [];
+
+// Строка про ближайшее событие. В разметку уходят три: если страница собрана
+// давно, скрипт уберёт прошедшие и первым окажется следующее.
+const next = upcoming.slice(0, 3);
+
+// Акцентом в заголовке красится последнее слово слогана.
+const cut = SITE.slogan.lastIndexOf(' ');
+const sloganHead = SITE.slogan.slice(0, cut);
+const sloganAccent = SITE.slogan.slice(cut + 1);
+---
+
+<Base>
+  <section class="hero">
+    <!-- Сцен две, видна одна: на широком экране сова сидит на панели, на узком
+         панель была бы мелкой, и сова остаётся одна. -->
+    <div class="hero__visual">
+      <Mascot scene="perch" class="hero__scene hero__scene--wide" />
+      <Mascot scene="solo" class="hero__scene hero__scene--narrow" />
+    </div>
+    <div class="hero__text">
+      <p class="eyebrow">{SITE.descriptor}</p>
+      <h1>{sloganHead} <em>{sloganAccent}</em></h1>
+      <p class="hero__lead">
+        Чаты, доклады, люди и события: для всех, кто занимается эксплуатацией, от студентов до лидов. Каталог
+        пополняет само сообщество.
+      </p>
+      <div class="actions hero__actions">
+        {
+          SITE.chat.url ? (
+            <ExternalLink class="button" href={SITE.chat.url}>
+              <Icon name="message-circle" />
+              Зайти в чат
+            </ExternalLink>
+          ) : (
+            <a class="button" href="/communities/">
+              <Icon name="message-circle" />
+              Найти чат
+            </a>
+          )
+        }
+        <a class="button button--ghost" href="/talks/">
+          <Icon name="presentation" />
+          Доклады
+        </a>
+      </div>
+    </div>
+    <ul class="tiles">
+      {
+        tiles.map((tile) => (
+          <li>
+            <a class="tile" href={tile.href}>
+              <span class="tile__count">{tile.count}</span>
+              <span class="tile__title">{heading(tile.href)}</span>
+              <span class="tile__text">{tile.text}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  {
+    talks.length > 0 && (
+      <section class="section">
+        <div class="section__head">
+          <h2>Что посмотреть</h2>
+          <a href="/talks/">Все доклады</a>
+        </div>
+        <ul class="grid">
+          {talks.map((talk) => (
+            <TalkCard talk={talk} level={3} />
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    communities.length > 0 && (
+      <section class="section">
+        <div class="section__head">
+          <h2>Где поговорить</h2>
+          <a href="/communities/">Все сообщества</a>
+        </div>
+        <ul class="grid">
+          {communities.map((community) => (
+            <CommunityCard community={community} level={3} />
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    people.length > 0 && (
+      <section class="section">
+        <div class="section__head">
+          <h2>К кому обратиться</h2>
+          <a href="/people/">Все люди</a>
+        </div>
+        <ul class="grid">
+          {people.map((person) => (
+            <PersonCard person={person} level={3} />
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    next.length > 0 && (
+      <section class="section" data-upcoming>
+        <div class="strip" data-group>
+          <div class="strip__body">
+            <p class="eyebrow">Ближайшее событие</p>
+            <ul class="strip__list">
+              {next.map((event) => (
+                <li data-ends={endOfEvent(event.data).toISOString()}>
+                  <a class="strip__title" href={eventHref(event)}>
+                    {event.data.title}
+                  </a>
+                  <p class="meta">
+                    <span>{formatDays(event.data)}</span>
+                    <span>{place(event.data, countryName)}</span>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <a class="button button--ghost button--small" href="/events/">
+            <Icon name="calendar" size={16} />
+            Календарь
+          </a>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <div class="section__head">
+      <h2>Как добавить своё</h2>
+      <a href="/contribute/">Подробнее</a>
+    </div>
+    <ol class="steps">
+      <li class="step">
+        <h3>Кинь ссылку в чат</h3>
+        <p>Самый короткий путь: напиши, что это и зачем оно сообществу. Запись оформим сами.</p>
+      </li>
+      <li class="step">
+        <h3>Заполни форму</h3>
+        <p>
+          <ExternalLink href={REPO.issues}>Форма на GitHub</ExternalLink> задаёт те же вопросы, что и файл записи. Код знать не нужно.
+        </p>
+      </li>
+      <li class="step">
+        <h3>Открой PR</h3>
+        <p>Одна запись — один YAML-файл. Скопируй шаблон, заполни, отправь: проверки скажут, если что-то не так.</p>
+      </li>
+    </ol>
+  </section>
+</Base>
+
+<script>
+  import { dropPast } from '../scripts/past';
+
+  dropPast();
+</script>

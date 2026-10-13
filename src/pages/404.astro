@@ -1,0 +1,27 @@
+---
+import Icon from '../components/Icon.astro';
+import Mascot from '../components/Mascot.astro';
+import { NAV } from '../lib/site';
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Страницы нет" noindex>
+  <header class="page-head page-head--mascot">
+    <Mascot scene="solo" class="page-head__mascot" />
+    <p class="eyebrow">404</p>
+    <h1>Такой страницы нет</h1>
+    <p class="page-head__lead">
+      Возможно, запись убрали из каталога или адрес набран с ошибкой. Вот что точно на месте:
+    </p>
+    <div class="actions">
+      {
+        NAV.map((item) => (
+          <a class="button button--ghost button--small" href={item.href}>
+            <Icon name={item.icon} size={16} />
+            {item.label}
+          </a>
+        ))
+      }
+    </div>
+  </header>
+</Base>
