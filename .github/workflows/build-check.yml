@@ -28,6 +28,11 @@ on:
 permissions:
   contents: read
 
+# Браузеры для make ui-check ставятся вместе с зависимостями, а make check
+# они не нужны: без переменной их качал бы каждый PR с одной записью
+env:
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+
 # Новый пуш в PR отменяет предыдущую проверку
 concurrency:
   group: build-check-${{ github.ref }}

@@ -51,12 +51,15 @@ jobs:
         with:
           node-version: 24
 
+      # Вместе с зависимостями ставятся все три движка: пакеты
+      # @playwright/browser-* качают Chromium, Firefox и WebKit той же версии,
+      # что и playwright
       - name: Install dependencies
         run: make install
 
-      # Версия движков привязана к версии playwright в package.json
-      - name: Install browsers
-        run: bunx playwright install --with-deps chromium firefox webkit
+      # Системные библиотеки, без которых движки на Ubuntu не запускаются
+      - name: Install browser system libraries
+        run: bunx playwright install-deps chromium firefox webkit
 
       # При CI=true движок, который не запустился, роняет проверку. По ходу
       # проверка печатает строку на каждый прогон, нарушения уходят аннотациями,

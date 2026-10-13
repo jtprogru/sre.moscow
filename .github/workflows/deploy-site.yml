@@ -36,6 +36,11 @@ permissions:
   pages: write
   id-token: write
 
+# Браузеры для make ui-check ставятся вместе с зависимостями, а деплою они
+# не нужны, и зависеть от того, отвечает ли их CDN, он не должен
+env:
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+
 # Только один деплой за раз; новые отменяют ожидающие, но не in-progress
 concurrency:
   group: pages
