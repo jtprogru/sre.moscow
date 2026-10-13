@@ -1,0 +1,144 @@
+---
+import ExternalLink from '../components/ExternalLink.astro';
+import { heading, REPO, SITE } from '../lib/site';
+import Base from '../layouts/Base.astro';
+
+// Один блок на тип записи и ещё один на разбор: он живёт в файле события,
+// но добавляют его отдельно. Якоря совпадают с теми, на которые ссылаются
+// кнопки «Добавить …» в разделах.
+const kinds = [
+  {
+    id: 'event',
+    title: 'Событие',
+    text: 'Конференция или митап с датой и страницей, где про надёжность и эксплуатацию — основная тема, а не один из треков.',
+    form: 'event',
+    template: 'event',
+  },
+  {
+    id: 'recap',
+    title: 'Разбор события',
+    text: 'Текст участника о том, что было на прошедшем событии: в личном блоге, на Хабре, где угодно. Открытый, без оплаты и регистрации. Профиль автора для этого не нужен.',
+    form: 'recap',
+    template: 'event',
+  },
+  {
+    id: 'organizer',
+    title: 'Компания или организатор',
+    text: 'Тот, кто регулярно проводит публичные технические события. Нужна страница, где видно расписание или анонсы. Место в каталоге не продаётся.',
+    form: 'organizer',
+    template: 'organizer',
+  },
+  {
+    id: 'community',
+    title: 'Чат, канал, подкаст',
+    text: 'Площадка с фокусом на SRE, надёжности или observability. Общие DevOps-чаты, каналы вакансий и реклама курсов не подходят.',
+    form: 'community',
+    template: 'community',
+  },
+  {
+    id: 'talk',
+    title: 'Доклад',
+    text: 'Доклад с открытой записью и одной фразой о том, зачем его смотреть. Добавить может кто угодно, профиль спикера для этого не нужен.',
+    form: 'talk',
+    template: 'talk',
+  },
+  {
+    id: 'profile',
+    title: 'Свой профиль',
+    text: 'Только свой или с явного согласия человека. В профиле — чем занимаешься, по каким темам и зачем к тебе можно обращаться.',
+    form: 'profile',
+    template: 'person',
+  },
+];
+---
+
+<Base
+  title={heading('/contribute/')}
+  description="Добавить чат, событие, доклад, организатора или свой профиль в каталог sre.moscow: три способа, от ссылки в чате до PR."
+>
+  <header class="page-head">
+    <h1>{heading('/contribute/')}</h1>
+    <p class="page-head__lead">
+      Каталог — это папка с файлами в <ExternalLink href={SITE.repo}>репозитории</ExternalLink>: одна запись — один файл. Добавить
+      свою можно тремя способами, от самого простого к самому быстрому.
+    </p>
+  </header>
+
+  <ol class="steps">
+    <li class="step">
+      <h3>Кинь ссылку в чат</h3>
+      <p>
+        {
+          SITE.chat.url ? (
+            <>
+              Напиши в <ExternalLink href={SITE.chat.url}>чате</ExternalLink>, что это и зачем оно сообществу. Запись оформят кураторы.
+            </>
+          ) : (
+            'Напиши в чате сообщества, что это и зачем оно сообществу. Запись оформят кураторы.'
+          )
+        }
+      </p>
+    </li>
+    <li class="step">
+      <h3>Заполни форму на GitHub</h3>
+      <p>
+        <ExternalLink href={REPO.issues}>Формы</ExternalLink> задают те же вопросы, что и файл записи. Нужен только аккаунт на GitHub.
+      </p>
+    </li>
+    <li class="step">
+      <h3>Открой PR</h3>
+      <p>
+        Скопируй шаблон из <ExternalLink href={REPO.tree('templates')}><code>templates/</code></ExternalLink> в нужную папку{' '}
+        <code>data/</code>, заполни и отправь. Пошагово — в{' '}
+        <ExternalLink href={REPO.file('CONTRIBUTING.md')}>CONTRIBUTING.md</ExternalLink>.
+      </p>
+    </li>
+  </ol>
+
+  <section class="section">
+    <div class="section__head">
+      <h2>Что можно добавить</h2>
+      <ExternalLink href={REPO.file('CRITERIA.md')}>Критерии отбора целиком</ExternalLink>
+    </div>
+    <ul class="grid">
+      {
+        kinds.map((kind) => (
+          <li class="card" id={kind.id}>
+            <h3 class="card__title">{kind.title}</h3>
+            <p class="card__text">{kind.text}</p>
+            <div class="card__foot">
+              <ul class="links">
+                <li>
+                  <ExternalLink href={REPO.issue(kind.form)}>Заполнить форму</ExternalLink>
+                </li>
+                <li>
+                  <ExternalLink href={REPO.file(`templates/${kind.template}.yaml`)}>Шаблон файла</ExternalLink>
+                </li>
+              </ul>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="section prose" id="fix">
+    <h2>Исправить или удалить</h2>
+    <p>
+      Ссылка умерла, дата поменялась, чат закрылся — <ExternalLink href={REPO.issue('fix')}>напиши об этом</ExternalLink> или сразу
+      пришли PR с правкой файла.
+    </p>
+    <p>
+      Если запись о тебе и ты хочешь её убрать — тот же адрес. Профиль или упоминание удаляем по запросу без
+      вопросов и объяснений.
+    </p>
+  </section>
+
+  <section class="section prose" id="independence">
+    <h2>Независимость</h2>
+    <p>{SITE.independence.short}</p>
+    <ul>
+      {SITE.independence.details.map((line) => <li>{line}</li>)}
+    </ul>
+  </section>
+</Base>
