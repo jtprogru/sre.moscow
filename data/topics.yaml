@@ -1,0 +1,43 @@
+# Закрытый словарь тем. Из него схема строит перечисление: тема, которой здесь
+# нет, валит сборку. Новая тема добавляется отдельным PR в этот файл — так
+# словарь не расползается на «observability», «o11y» и «наблюдаемость».
+#
+# id    — то, что пишут в поле topics записи; латиница, kebab-case
+# title — то, что видит читатель на сайте
+
+- id: slo
+  title: SLI, SLO и error budget
+- id: observability
+  title: Observability
+- id: monitoring
+  title: Мониторинг и алертинг
+- id: incidents
+  title: Инциденты и on-call
+- id: postmortems
+  title: Постмортемы
+- id: capacity
+  title: Capacity planning
+- id: performance
+  title: Производительность
+- id: chaos
+  title: Chaos engineering
+- id: resilience
+  title: Отказоустойчивая архитектура
+- id: releases
+  title: Релизы и деплой
+- id: automation
+  title: Автоматизация и toil
+- id: platform
+  title: Platform engineering
+- id: kubernetes
+  title: Kubernetes
+- id: databases
+  title: Базы данных
+- id: networking
+  title: Сети
+- id: cost
+  title: Стоимость инфраструктуры
+- id: culture
+  title: Культура и процессы
+- id: career
+  title: Карьера и рост
