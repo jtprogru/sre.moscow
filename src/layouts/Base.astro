@@ -1,0 +1,154 @@
+---
+import '../styles/global.css';
+
+// Четыре файла, которыми набран первый экран: текст и заголовки, кириллица и
+// латиница. Остальные сабсеты браузер дотянет сам, когда встретит их символы.
+import sansRegularCyrillic from '../fonts/ibm-plex-sans/ibm-plex-sans-400n-cyrillic.woff2?url';
+import sansRegularLatin from '../fonts/ibm-plex-sans/ibm-plex-sans-400n-latin.woff2?url';
+import sansBoldCyrillic from '../fonts/ibm-plex-sans/ibm-plex-sans-700n-cyrillic.woff2?url';
+import sansBoldLatin from '../fonts/ibm-plex-sans/ibm-plex-sans-700n-latin.woff2?url';
+
+import { THEMES } from '../brand/palette';
+import Brand from '../components/Brand.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import Icon from '../components/Icon.astro';
+import Menu from '../components/Menu.astro';
+import Search from '../components/Search.astro';
+import Seo from '../components/Seo.astro';
+import { MENU, NAV, REPO, SITE } from '../lib/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { title, description, noindex, jsonLd } = Astro.props;
+const path = Astro.url.pathname;
+const preload = [sansRegularCyrillic, sansRegularLatin, sansBoldCyrillic, sansBoldLatin];
+
+// Цвет панели браузера — фон страницы из тех же токенов, что и вёрстка.
+const themes = THEMES;
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Выбор темы применяется до первой отрисовки, иначе страница мигнёт системной.
+         Записи в хранилище нет — режим «как в системе», и делать нечего.
+         Вид каталога ставится здесь же: выбранный, а пока выбора нет — список
+         на телефоне и карточки от 600 px. -->
+    <script is:inline>
+      var view;
+      try {
+        var theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+        view = localStorage.getItem('view');
+      } catch (e) {}
+      if (view !== 'list' && view !== 'cards') view = matchMedia('(max-width: 599px)').matches ? 'list' : 'cards';
+      document.documentElement.dataset.view = view;
+    </script>
+    <Seo title={title} description={description} noindex={noindex} jsonLd={jsonLd} />
+    {preload.map((href) => <link rel="preload" as="font" type="font/woff2" href={href} crossorigin />)}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.name} — новые события и доклады`} href="/rss.xml" />
+    <link rel="alternate" type="text/calendar" title={`${SITE.name} — календарь событий`} href="/events.ics" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content={themes.light.bg} media="(prefers-color-scheme: light)" data-scheme="light" />
+    <meta name="theme-color" content={themes.dark.bg} media="(prefers-color-scheme: dark)" data-scheme="dark" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container site-header__row">
+        <Brand />
+        <nav class="site-nav" aria-label="Разделы">
+          {
+            MENU.map((item) => (
+              <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+        <div class="site-header__tools">
+          <!-- Строка поиска: выглядит полем, работает кнопкой и открывает окно поиска. -->
+          <button
+            class="search-trigger"
+            type="button"
+            data-search-open
+            aria-label="Поиск по каталогу"
+            aria-haspopup="dialog"
+            aria-keyshortcuts="Control+K Meta+K"
+            hidden
+          >
+            <Icon name="search" size={16} />
+            <span class="search-trigger__label">Поиск</span>
+            <kbd class="search-trigger__kbd" data-search-kbd>Ctrl K</kbd>
+          </button>
+          <!-- Три режима по кругу; видна иконка текущего, её выбирает CSS по data-theme. -->
+          <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Тема" hidden>
+            <span data-theme-icon="system"><Icon name="monitor" /></span>
+            <span data-theme-icon="light"><Icon name="sun" /></span>
+            <span data-theme-icon="dark"><Icon name="moon" /></span>
+          </button>
+          <!-- До 768 px разделы и тема живут в меню. Без JS это ссылка на разделы в подвале. -->
+          <a class="icon-button menu-button" href="#sections" data-menu-open aria-label="Меню">
+            <Icon name="menu" />
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="container" id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__row">
+        <nav class="site-footer__group" id="sections" aria-labelledby="footer-sections">
+          <p class="eyebrow" id="footer-sections">Разделы</p>
+          <ul>
+            {
+              NAV.map((item) => (
+                <li>
+                  <a href={item.href}>{item.label}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+        <div class="site-footer__group">
+          <p class="eyebrow">Подписки</p>
+          <ul>
+            <li><a href="/events.ics">Календарь .ics</a></li>
+            <li><a href="/rss.xml">RSS</a></li>
+          </ul>
+          <p>Данные — CC BY 4.0, код — Apache-2.0.</p>
+        </div>
+        <div class="site-footer__group">
+          <p class="eyebrow">О проекте</p>
+          <p>{SITE.independence.short}</p>
+          <ul>
+            <li><ExternalLink href={SITE.repo}>GitHub</ExternalLink></li>
+            <li><ExternalLink href={REPO.issue('fix')}>Исправить или удалить</ExternalLink></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+
+    <Search />
+    <Menu />
+
+    <script>
+      import { initTheme } from '../scripts/theme';
+
+      initTheme();
+    </script>
+  </body>
+</html>

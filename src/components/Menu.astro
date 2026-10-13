@@ -1,0 +1,95 @@
+---
+import { MENU } from '../lib/site';
+import Brand from './Brand.astro';
+import Icon from './Icon.astro';
+
+// Меню на телефоне: на ширине до 768 px разделы, поиск и тема уходят из шапки
+// сюда. Открывает его кнопка [data-menu-open] в шапке.
+//
+// Без JS окно не открыть, поэтому кнопка — обычная ссылка на список разделов
+// в подвале: скрипт перехватывает её, а без него она просто работает.
+
+const path = Astro.url.pathname;
+
+const themes = [
+  { value: 'system', icon: 'monitor', label: 'Авто' },
+  { value: 'light', icon: 'sun', label: 'Светлая' },
+  { value: 'dark', icon: 'moon', label: 'Тёмная' },
+] as const;
+---
+
+<dialog class="menu" data-menu aria-label="Меню">
+  <div class="menu__head">
+    <Brand />
+    <button class="icon-button" type="button" data-menu-close aria-label="Закрыть меню">
+      <Icon name="x" />
+    </button>
+  </div>
+
+  <button class="search-trigger" type="button" data-search-open aria-label="Поиск по каталогу" aria-haspopup="dialog" hidden>
+    <Icon name="search" size={16} />
+    <span class="search-trigger__label">Поиск</span>
+  </button>
+
+  <nav class="menu__nav" aria-label="Разделы">
+    {
+      MENU.map((item) => (
+        <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>
+          <Icon name={item.icon} size={24} />
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+
+  <div class="menu__theme">
+    <p class="eyebrow" id="menu-theme">Тема</p>
+    <div class="menu__theme-options" role="radiogroup" aria-labelledby="menu-theme" data-theme-choice>
+      {
+        themes.map((theme) => (
+          <label class="choice">
+            <input type="radio" name="theme" value={theme.value} />
+            <span>
+              <Icon name={theme.icon} />
+              {theme.label}
+            </span>
+          </label>
+        ))
+      }
+    </div>
+    <p class="menu__hint">Авто следует за темой системы.</p>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-menu]');
+
+  if (dialog && typeof dialog.showModal === 'function') {
+    for (const opener of document.querySelectorAll<HTMLAnchorElement>('[data-menu-open]')) {
+      // Со скриптом ссылка ведёт себя как кнопка: открывает окно и отзывается на пробел.
+      opener.setAttribute('role', 'button');
+      opener.setAttribute('aria-haspopup', 'dialog');
+      opener.addEventListener('click', (event) => {
+        event.preventDefault();
+        dialog.showModal();
+      });
+      opener.addEventListener('keydown', (event) => {
+        if (event.key !== ' ') return;
+        event.preventDefault();
+        dialog.showModal();
+      });
+    }
+
+    dialog.querySelector('[data-menu-close]')?.addEventListener('click', () => dialog.close());
+
+    // Переход по ссылке закрывает меню: якорь этой же страницы её не перезагружает.
+    dialog.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('a[href]')) dialog.close();
+    });
+
+    // Экран стал шире — разделы вернулись в шапку, меню больше не нужно.
+    matchMedia('(min-width: 768px)').addEventListener('change', (event) => {
+      if (event.matches && dialog.open) dialog.close();
+    });
+  }
+</script>
