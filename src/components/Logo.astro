@@ -1,0 +1,10 @@
+---
+import { sign } from '../brand/sign';
+
+// Знак сайта. Геометрия — в src/brand/sign.ts, цвет колец наследуется от текста.
+interface Props {
+  class?: string;
+}
+---
+
+<svg class={Astro.props.class} viewBox="0 0 32 32" fill="none" aria-hidden="true" set:html={sign()} />

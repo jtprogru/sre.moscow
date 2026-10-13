@@ -1,0 +1,11 @@
+---
+import { SITE } from '../lib/site';
+import Logo from './Logo.astro';
+
+// Знак и словесный знак ссылкой на главную: в шапке и в меню на телефоне.
+---
+
+<a class="logo" href="/" aria-label={`${SITE.name} — на главную`}>
+  <Logo class="logo__mark" />
+  <span>sre<span class="logo__dot">.</span><span class="logo__tld">moscow</span></span>
+</a>
