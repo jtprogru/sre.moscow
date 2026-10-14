@@ -136,7 +136,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: telegram
-        uses: jtprogru/notiflow@v1.6.1
+        uses: jtprogru/notiflow@v2.0.2
         with:
           bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
