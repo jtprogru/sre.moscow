@@ -10,7 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check",
+    "check": "node ./node_modules/astro/bin/astro.mjs check",
     "lint": "markdownlint-cli2 \"**/*.md\""
   },
   "dependencies": {
